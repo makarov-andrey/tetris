@@ -12,7 +12,7 @@ export class GameData {
         public settings: GameSettings,
     ) {}
 
-    static makeSimple(width: number = 12, height: number = 25): GameData {
+    static makeSimple(width: number = 10, height: number = 20): GameData {
         return new GameData(
             false,
             false,

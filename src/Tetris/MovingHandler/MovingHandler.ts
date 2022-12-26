@@ -2,6 +2,7 @@ import {CommandBus, CommandType, MoveLeftCommand, MoveRightCommand, TurnClockwis
 import {FigureTurnState} from "../Figures";
 import {EventBus, FiguresMovedEvent} from "../EventBus/EventBus";
 import {Coordinate, FallingFigure} from "../Structures";
+import {FigurePlacingChecker} from "../Utils/FigurePlacingChecker";
 
 export class MovingHandler {
     constructor(
@@ -16,7 +17,7 @@ export class MovingHandler {
 
     private processMoveLeftCommand(command: MoveLeftCommand): void {
         command.gameData.fallingFigures.forEach(figure => {
-            const canBeMovedLeft = this.canFigureBeMoved(
+            const canBeMovedLeft = FigurePlacingChecker.canFigureBePlaced(
                 figure.figure.getTurn(figure.turnState),
                 new Coordinate(figure.position.x - 1, figure.position.y),
                 command.gameData.matrix
@@ -30,7 +31,7 @@ export class MovingHandler {
 
     private processMoveRightCommand(command: MoveRightCommand): void {
         command.gameData.fallingFigures.forEach(figure => {
-            const canBeMovedRight = this.canFigureBeMoved(
+            const canBeMovedRight = FigurePlacingChecker.canFigureBePlaced(
                 figure.figure.getTurn(figure.turnState),
                 new Coordinate(figure.position.x + 1, figure.position.y),
                 command.gameData.matrix
@@ -49,7 +50,7 @@ export class MovingHandler {
             if (!(nextTurnState in allTurnStates)) {
                 nextTurnState = allTurnStates[0];
             }
-            const canBeTurned = this.canFigureBeMoved(
+            const canBeTurned = FigurePlacingChecker.canFigureBePlaced(
                 figure.figure.getTurn(nextTurnState),
                 figure.position,
                 command.gameData.matrix
@@ -63,22 +64,6 @@ export class MovingHandler {
 
     private processMoveDownCommand(command: MoveDownCommand): void {
         this.commandBus.run(new FiguresFallTickCommand(command.gameData));
-    }
-
-    private canFigureBeMoved(targetFigureMatrix: boolean[][], targetPosition: Coordinate, matrix: boolean[][]): boolean {
-        return targetFigureMatrix.every((row, y) => {
-            return row.every((value, x) => {
-                const realY = targetPosition.y + y;
-                const realX = targetPosition.x + x;
-                return !value
-                    || realY < 0
-                    || (
-                        realY in matrix
-                        && realX in matrix[realY]
-                        && !matrix[realY][realX]
-                    );
-            });
-        });
     }
 
     private getTurnStatesAsArray(): FigureTurnState[] {

@@ -1,6 +1,5 @@
 import {GameController} from './GameController'
 import {TableRenderer, TableRendererSettings} from './Renderer/TableRenderer'
-import {ConstTimingsHandler} from "./TimingsHandler/ConstTimingsHandler";
 import {RegularFallingFiguresProcessor} from "./FallingFiguresProcessor/RegularFallingFiguresProcessor";
 import {AlwaysOneFigureSpawner} from "./FiguresSpawner/AlwaysOneFigureSpawner";
 import {EventBus} from "./EventBus/EventBus";
@@ -8,13 +7,20 @@ import {CommandBus, InitGameCommand, PauseGameCommand, ResumeGameCommand} from "
 import {GameData} from "./GameData";
 import {MovingHandler} from "./MovingHandler/MovingHandler";
 import {MovingController} from "./MovingController/MovingController";
-import {ReducingTimingsHandler} from "./TimingsHandler/ReducingTimingsHandler";
+import {LevelBasedTimingsHandler} from "./TimingsHandler/LevelBasedTimingsHandler";
 
 export class TetrisFacade {
     private eventBus = new EventBus();
     private commandBus = new CommandBus();
     private gameController = new GameController(
-        new ReducingTimingsHandler(this.eventBus, this.commandBus, 500, 10, 0.7),
+        new LevelBasedTimingsHandler(
+            this.eventBus,
+            this.commandBus,
+            10,
+            1000,
+            15,
+            1
+        ),
         this.eventBus,
         this.commandBus,
     );

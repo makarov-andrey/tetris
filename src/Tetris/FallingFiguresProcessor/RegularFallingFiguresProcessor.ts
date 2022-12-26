@@ -1,7 +1,8 @@
-import {FallingFigure} from "../Structures";
+import {Coordinate, FallingFigure} from "../Structures";
 import {FiguresFallDownCommand, CommandBus, CommandType, GameOverCommand, FiguresFallTickCommand} from "../CommandBus/CommandBus";
 import {EventBus, FallTickProcessedEvent} from "../EventBus/EventBus";
 import {GameData} from "../GameData";
+import {FigurePlacingChecker} from "../Utils/FigurePlacingChecker";
 
 class FallingResult {
     public transferredFigures: FallingFigure[] = [];
@@ -66,20 +67,11 @@ export class RegularFallingFiguresProcessor {
     }
 
     private figureCanFall(matrix: boolean[][], fallingFigure: FallingFigure): boolean {
-        return fallingFigure.figure.getTurn(fallingFigure.turnState)
-            .every((row, figureCellY) => {
-                return row.every((cellValue, figureCellX) => {
-                    let nextFallMatrixX = fallingFigure.position.x + figureCellX;
-                    let nextFallMatrixY = fallingFigure.position.y + figureCellY + 1;
-                    return !cellValue
-                        || nextFallMatrixY < 0
-                        || (
-                            nextFallMatrixY in matrix
-                            && nextFallMatrixX in matrix[nextFallMatrixY]
-                            && !matrix[nextFallMatrixY][nextFallMatrixX]
-                        );
-                });
-            });
+        return FigurePlacingChecker.canFigureBePlaced(
+            fallingFigure.figure.getTurn(fallingFigure.turnState),
+            new Coordinate(fallingFigure.position.x, fallingFigure.position.y + 1),
+            matrix
+        );
     }
 
     private transferFigureToMatrix(matrix: boolean[][], fallingFigure: FallingFigure): boolean {
