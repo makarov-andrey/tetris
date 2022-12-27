@@ -10,7 +10,6 @@ export class MovingController {
 
     private processInitGameCommand(command: InitGameCommand) {
         window.onkeydown = event => {
-            console.log(event);
             if (event.code === 'ArrowLeft') {
                 this.commandBus.run(new MoveLeftCommand(command.gameData));
             } else if (event.code === 'ArrowRight') {
