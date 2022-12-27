@@ -1,11 +1,12 @@
 import {TimingsHandler} from "./TimingsHandler";
+import {GameData} from "../GameData";
 
 export class ConstTimingsHandler implements TimingsHandler {
     constructor(
         public delayMs: number,
     ) {}
 
-    getDelayForNextTickMs(): number {
+    getDelayForNextTickMs(gameData: GameData): number {
         return this.delayMs;
     }
 }

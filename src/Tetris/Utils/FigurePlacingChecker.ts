@@ -9,8 +9,8 @@ export class FigurePlacingChecker {
                 return !value
                     || (
                         realY < 0
-                        && realX > 0
-                        && realX < matrix[0].length - 1
+                        && realX >= 0
+                        && realX <= matrix[0].length - 1
                     ) || (
                         realY in matrix
                         && realX in matrix[realY]

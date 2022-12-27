@@ -50,7 +50,7 @@ export class GameController {
         if (!this.gameData.isGameOver) {
             this.gameData.nextTickTimeoutId = setTimeout(
                 this.fallTick.bind(this),
-                this.timingsHandler.getDelayForNextTickMs()
+                this.timingsHandler.getDelayForNextTickMs(this.gameData)
             );
         }
     }

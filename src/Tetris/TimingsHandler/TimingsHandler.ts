@@ -1,3 +1,5 @@
+import {GameData} from "../GameData";
+
 export interface TimingsHandler {
-    getDelayForNextTickMs(): number;
+    getDelayForNextTickMs(gameData: GameData): number;
 }

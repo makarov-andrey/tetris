@@ -10,6 +10,8 @@ export class GameData {
         public matrix: boolean[][] = [],
         public nextTickTimeoutId: ReturnType<typeof setTimeout> = setTimeout(() => {}),
         public settings: GameSettings,
+        public level: number = 1,
+        public score: number = 0,
     ) {}
 
     static makeSimple(width: number = 10, height: number = 20): GameData {

@@ -1,4 +1,4 @@
-import {Figure, LeftLFigure, RightLFigure, SquareFigure, StickFigure, TFigure} from "./Figures";
+import {Figure} from "./Figures";
 
 export class GameSettings {
     constructor(

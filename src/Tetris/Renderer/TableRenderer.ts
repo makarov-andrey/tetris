@@ -43,6 +43,8 @@ class CellColors {
 
 export class TableRenderer {
     private cellsHtmlElementsMap: HTMLElement[][] = [];
+    private table: HTMLElement|undefined;
+    private scoreDisplay: HTMLElement|undefined;
 
     constructor (
         private renderSettings: TableRendererSettings,
@@ -54,7 +56,7 @@ export class TableRenderer {
     }
 
     private initHandler(command: InitGameCommand): void {
-        let table = TableRenderer.createHtmlElement('<div style="display: table; border-collapse: collapse"></div>');
+        this.table = TableRenderer.createHtmlElement('<div style="float: left; display: table; border-collapse: collapse"></div>');
         this.cellsHtmlElementsMap = [];
         for (let y = 0; y < command.gameData.settings.fieldHeight; y++) {
             let row = TableRenderer.createHtmlElement('<div style="display: table-row"></div>');
@@ -64,12 +66,22 @@ export class TableRenderer {
                 this.cellsHtmlElementsMap[y][x] = cell;
                 row.appendChild(cell);
             }
-            table.appendChild(row);
+            this.table.appendChild(row);
         }
-        this.renderSettings.containerElement.replaceChildren(table);
+        this.renderSettings.containerElement.innerHTML = '';
+        this.renderSettings.containerElement.appendChild(this.table);
+
+        this.scoreDisplay = TableRenderer.createHtmlElement(
+            `<div style="float: left; font-family: 'Helvetica Neue', sans-serif; font-size: 20px; margin-left: 15px;">
+                Level: <span id="level"></span><br>
+                Score: <span id="score"></span>
+            </div>`);
+        this.renderSettings.containerElement.appendChild(this.scoreDisplay);
+
+        this.renderSettings.containerElement.appendChild(TableRenderer.createHtmlElement('<div style="clear: both"></div>'));
 
         this.eventBus.on(EventType.FallingTickProcessed, this.onFallTickProcessed.bind(this));
-        this.eventBus.on(EventType.GameOver, this.onFallTickProcessed.bind(this));
+        this.eventBus.on(EventType.GameOver, this.onGameOver.bind(this));
         this.eventBus.on(EventType.FiguresMoved, this.onFiguresMoved.bind(this));
     }
 
@@ -95,6 +107,7 @@ export class TableRenderer {
             this.renderFallingFiguresProjection(gameData);
         }
         this.renderFallingFigures(gameData);
+        this.renderStats(gameData);
     }
 
     private renderFallingFigures(gameData: GameData): void {
@@ -186,6 +199,17 @@ export class TableRenderer {
                 }
             });
         });
+    }
+
+    private renderStats(gameData: GameData): void {
+        const levelSpan = document.getElementById('level');
+        const scoreSpan = document.getElementById('score');
+        if (levelSpan !== null) {
+            levelSpan.innerHTML = gameData.level.toString();
+        }
+        if (scoreSpan !== null) {
+            scoreSpan.innerHTML = gameData.score.toString();
+        }
     }
 
     private static createHtmlElement(html: string): HTMLElement {
