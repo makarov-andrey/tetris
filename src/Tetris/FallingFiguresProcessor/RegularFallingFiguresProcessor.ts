@@ -1,7 +1,6 @@
-import {Coordinate, FallingFigure} from "../Structures";
-import {FiguresFallDownCommand, CommandBus, CommandType, GameOverCommand, FiguresFallTickCommand} from "../CommandBus/CommandBus";
+import {Coordinate, FallingFigure, GameData} from "../Common";
+import {DropFiguresCommand, CommandBus, CommandType, GameOverCommand, FiguresFallTickCommand} from "../CommandBus/CommandBus";
 import {EventBus, FallTickProcessedEvent} from "../EventBus/EventBus";
-import {GameData} from "../GameData";
 import {FigurePlacingChecker} from "../Utils/FigurePlacingChecker";
 
 class FallingResult {
@@ -15,7 +14,7 @@ export class RegularFallingFiguresProcessor {
         private eventBus: EventBus,
     ) {
         this.commandBus.addHandler(CommandType.FiguresFallTick, this.processFiguresFallTickCommand.bind(this));
-        this.commandBus.addHandler(CommandType.FiguresFallDown, this.processFiguresFallDownCommand.bind(this));
+        this.commandBus.addHandler(CommandType.FiguresFallDown, this.processDropFiguresCommand.bind(this));
     }
 
     private processFiguresFallTickCommand(command: FiguresFallTickCommand) {
@@ -28,15 +27,18 @@ export class RegularFallingFiguresProcessor {
             command.gameData,
             fallingResult.transferredFigures,
             squashedLines,
+            0
         ));
     }
 
-    private processFiguresFallDownCommand(command: FiguresFallDownCommand): void {
+    private processDropFiguresCommand(command: DropFiguresCommand): void {
         let fallingResult = new FallingResult();
+        let droppedLines = 0;
         while (command.gameData.fallingFigures.length > 0) {
             const oneCellFallingResult = this.fallFiguresForOneCell(command.gameData);
             fallingResult.transferredFigures.push(...oneCellFallingResult.transferredFigures);
             fallingResult.isGameOver = fallingResult.isGameOver || oneCellFallingResult.isGameOver;
+            droppedLines++;
         }
         let squashedLines = this.squashLines(command.gameData.matrix);
         if (fallingResult.isGameOver) {
@@ -46,6 +48,7 @@ export class RegularFallingFiguresProcessor {
             command.gameData,
             fallingResult.transferredFigures,
             squashedLines,
+            droppedLines - 1,
         ));
     }
 

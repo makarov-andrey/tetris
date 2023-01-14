@@ -1,5 +1,5 @@
-import {CommandBus, CommandType, FiguresFallDownCommand, InitGameCommand, MoveLeftCommand, MoveRightCommand, TurnClockwiseCommand, MoveDownCommand} from "../CommandBus/CommandBus";
-import {GameData} from "../GameData";
+import {CommandBus, CommandType, DropFiguresCommand, InitGameCommand, MoveLeftCommand, MoveRightCommand, TurnClockwiseCommand, MoveDownCommand} from "../CommandBus/CommandBus";
+import {GameData} from "../Common";
 
 export class MovingController {
     constructor(
@@ -21,7 +21,7 @@ export class MovingController {
             } else if (event.code === 'ArrowDown') {
                 this.commandBus.run(new MoveDownCommand(command.gameData));
             } else if (event.code === 'Space') {
-                this.commandBus.run(new FiguresFallDownCommand(command.gameData));
+                this.commandBus.run(new DropFiguresCommand(command.gameData));
             }
         };
     }

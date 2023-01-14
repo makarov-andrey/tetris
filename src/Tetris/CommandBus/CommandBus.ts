@@ -1,4 +1,4 @@
-import {GameData} from "../GameData";
+import {GameData} from "../Common";
 
 export enum CommandType {
     InitGame,
@@ -120,7 +120,7 @@ export class MoveDownCommand implements Command {
     }
 }
 
-export class FiguresFallDownCommand implements Command {
+export class DropFiguresCommand implements Command {
     constructor(
         public gameData: GameData,
     ) {}

@@ -1,7 +1,7 @@
 import {CommandBus, CommandType, MoveLeftCommand, MoveRightCommand, TurnClockwiseCommand, MoveDownCommand, FiguresFallTickCommand} from "../CommandBus/CommandBus";
 import {FigureTurnState} from "../Figures";
 import {EventBus, FiguresMovedEvent} from "../EventBus/EventBus";
-import {Coordinate, FallingFigure} from "../Structures";
+import {Coordinate, FallingFigure} from "../Common";
 import {FigurePlacingChecker} from "../Utils/FigurePlacingChecker";
 
 export class MovingHandler {

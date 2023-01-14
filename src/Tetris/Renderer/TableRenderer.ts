@@ -1,8 +1,7 @@
 import {CommandBus, CommandType, InitGameCommand, RenderCommand} from "../CommandBus/CommandBus";
 import {EventBus, EventType, FallTickProcessedEvent, GameOverEvent} from "../EventBus/EventBus";
-import {GameData} from "../GameData";
 import {FigurePlacingChecker} from "../Utils/FigurePlacingChecker";
-import {Coordinate} from "../Structures";
+import {Coordinate, GameData} from "../Common";
 
 export class TableRendererCellColorSettings {
     constructor(
@@ -74,7 +73,8 @@ export class TableRenderer {
         this.scoreDisplay = TableRenderer.createHtmlElement(
             `<div style="float: left; font-family: 'Helvetica Neue', sans-serif; font-size: 20px; margin-left: 15px;">
                 Level: <span id="level"></span><br>
-                Score: <span id="score"></span>
+                Score: <span id="score"></span><br>
+                Combo: <span id="combo"></span><br>
             </div>`);
         this.renderSettings.containerElement.appendChild(this.scoreDisplay);
 
@@ -204,11 +204,15 @@ export class TableRenderer {
     private renderStats(gameData: GameData): void {
         const levelSpan = document.getElementById('level');
         const scoreSpan = document.getElementById('score');
+        const comboSpan = document.getElementById('combo');
         if (levelSpan !== null) {
             levelSpan.innerHTML = gameData.level.toString();
         }
         if (scoreSpan !== null) {
             scoreSpan.innerHTML = gameData.score.toString();
+        }
+        if (comboSpan !== null) {
+            comboSpan.innerHTML = gameData.combo.toString();
         }
     }
 

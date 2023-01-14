@@ -1,7 +1,7 @@
 import {TimingsHandler} from "./TimingsHandler/TimingsHandler";
-import {EventBus, GameOverEvent} from "./EventBus/EventBus";
-import {GameData} from "./GameData";
+import {EventBus, EventType, FallTickProcessedEvent, FiguresMovedEvent, GameOverEvent} from "./EventBus/EventBus";
 import {CommandBus, CommandType, FiguresFallTickCommand, InitGameCommand, PauseGameCommand, RenderCommand, ResumeGameCommand} from "./CommandBus/CommandBus";
+import {GameData} from "./Common";
 
 export class GameController {
     private gameData: GameData = GameData.makeSimple();
@@ -20,6 +20,7 @@ export class GameController {
     private initGameHandler(command: InitGameCommand): void {
         this.gameData = command.gameData;
         this.gameData.isInitialized = true;
+        this.eventBus.on(EventType.FallingTickProcessed, this.onFallTickProcessed.bind(this));
     }
 
     private resumeGameHandler(command: ResumeGameCommand): void {
@@ -32,21 +33,25 @@ export class GameController {
         this.fallTick();
     }
 
-    private pauseGameHandler(command: ResumeGameCommand): void {
+    private pauseGameHandler(command: PauseGameCommand): void {
         this.gameData = command.gameData;
         clearTimeout(this.gameData.nextTickTimeoutId);
         this.commandBus.run(new RenderCommand(this.gameData));
     }
 
     private gameOverHandler(): void {
-        clearTimeout(this.gameData.nextTickTimeoutId);
         this.gameData.isInitialized = false;
         this.gameData.isGameOver = true;
+        clearTimeout(this.gameData.nextTickTimeoutId);
         this.eventBus.fire(new GameOverEvent(this.gameData));
     }
 
     private fallTick(): void {
         this.commandBus.run(new FiguresFallTickCommand(this.gameData));
+    }
+
+    private onFallTickProcessed(event: FallTickProcessedEvent): void {
+        clearTimeout(this.gameData.nextTickTimeoutId);
         if (!this.gameData.isGameOver) {
             this.gameData.nextTickTimeoutId = setTimeout(
                 this.fallTick.bind(this),

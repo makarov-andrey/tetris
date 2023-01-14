@@ -4,12 +4,13 @@ import {RegularFallingFiguresProcessor} from "./FallingFiguresProcessor/RegularF
 import {AlwaysOneFigureSpawner} from "./FiguresSpawner/AlwaysOneFigureSpawner";
 import {EventBus} from "./EventBus/EventBus";
 import {CommandBus, InitGameCommand, PauseGameCommand, ResumeGameCommand} from "./CommandBus/CommandBus";
-import {GameData} from "./GameData";
 import {MovingHandler} from "./MovingHandler/MovingHandler";
 import {MovingController} from "./MovingController/MovingController";
 import {LevelBasedTimingsHandler} from "./TimingsHandler/LevelBasedTimingsHandler";
-import {SquashedRowsScoreCounter} from "./ScoreCounter/SquashedRowsScoreCounter";
+import {FallTickScoreCounter} from "./ScoreCounter/FallTickScoreCounter";
 import {SquashedRowsCounterBasedLevelCounter} from "./LevelCounter/SquashedRowsCounterBasedLevelCounter";
+import {GameData} from "./Common";
+import {ComboCounter} from "./ComboCounter/ComboCounter";
 
 export class TetrisFacade {
     private eventBus = new EventBus();
@@ -37,10 +38,15 @@ export class TetrisFacade {
     private levelCounter = new SquashedRowsCounterBasedLevelCounter(
         this.eventBus,
         this.commandBus,
-        10,
+        8,
         15,
     );
-    private scoreCounter = new SquashedRowsScoreCounter(
+    private comboCounter = new ComboCounter(
+        this.commandBus,
+        this.eventBus,
+    );
+    private scoreCounter = new FallTickScoreCounter(
+        this.commandBus,
         this.eventBus,
     );
     private tableRenderer = new TableRenderer(

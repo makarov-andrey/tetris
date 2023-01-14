@@ -1,5 +1,5 @@
 import {TimingsHandler} from "./TimingsHandler";
-import {GameData} from "../GameData";
+import {GameData} from "../Common";
 
 export class ConstTimingsHandler implements TimingsHandler {
     constructor(

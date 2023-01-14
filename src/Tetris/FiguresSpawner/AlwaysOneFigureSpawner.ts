@@ -1,8 +1,7 @@
 import {EventBus, EventType, FallTickProcessedEvent} from "../EventBus/EventBus";
 import {FigureTurnState} from "../Figures";
-import {Coordinate, FallingFigure} from "../Structures";
+import {Coordinate, FallingFigure, GameData} from "../Common";
 import {CommandBus, CommandType, InitGameCommand} from "../CommandBus/CommandBus";
-import {GameData} from "../GameData";
 
 export class AlwaysOneFigureSpawner {
     constructor(

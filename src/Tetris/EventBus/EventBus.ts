@@ -1,5 +1,4 @@
-import {GameData} from "../GameData";
-import {FallingFigure} from "../Structures";
+import {FallingFigure, GameData} from "../Common";
 
 export enum EventType {
     FallingTickProcessed,
@@ -19,6 +18,7 @@ export class FallTickProcessedEvent implements Event {
         public gameData: GameData,
         public transferredToMatrixFigures: FallingFigure[],
         public squashedLines: number[],
+        public droppedLines: number,
     ) {}
 
     public getEventType(): EventType {

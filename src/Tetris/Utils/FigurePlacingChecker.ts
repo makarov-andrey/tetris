@@ -1,4 +1,4 @@
-import {Coordinate} from "../Structures";
+import {Coordinate} from "../Common";
 
 export class FigurePlacingChecker {
     public static canFigureBePlaced(targetFigureMatrix: boolean[][], targetPosition: Coordinate, matrix: boolean[][]): boolean {
