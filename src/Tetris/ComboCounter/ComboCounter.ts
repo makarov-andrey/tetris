@@ -10,10 +10,10 @@ export class ComboCounter {
     }
 
     private initGameHandler(command: InitGameCommand) {
-        this.eventBus.on(EventType.FallingTickProcessed, this.onFallingTickProcessed.bind(this));
+        this.eventBus.on(EventType.FallingTickProcessed, this.onFallTickProcessed.bind(this));
     }
 
-    private onFallingTickProcessed(event: FallTickProcessedEvent) {
+    private onFallTickProcessed(event: FallTickProcessedEvent) {
         if (event.transferredToMatrixFigures.length <= 0) {
             return;
         }

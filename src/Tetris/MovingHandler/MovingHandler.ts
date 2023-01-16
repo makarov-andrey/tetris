@@ -3,6 +3,7 @@ import {FigureTurnState} from "../Figures";
 import {EventBus, FiguresMovedEvent} from "../EventBus/EventBus";
 import {Coordinate, FallingFigure} from "../Common";
 import {FigurePlacingChecker} from "../Utils/FigurePlacingChecker";
+import {EnumHelper} from "../Utils/EnumHelper";
 
 export class MovingHandler {
     constructor(
@@ -44,7 +45,7 @@ export class MovingHandler {
     }
 
     private processTurnClockwiseCommand(command: TurnClockwiseCommand): void {
-        const allTurnStates = this.getTurnStatesAsArray();
+        const allTurnStates = EnumHelper.ToArray(FigureTurnState);
         command.gameData.fallingFigures.forEach(figure => {
             let nextTurnState = figure.turnState + 1;
             if (!(nextTurnState in allTurnStates)) {
@@ -64,11 +65,5 @@ export class MovingHandler {
 
     private processMoveDownCommand(command: MoveDownCommand): void {
         this.commandBus.run(new FiguresFallTickCommand(command.gameData));
-    }
-
-    private getTurnStatesAsArray(): FigureTurnState[] {
-        return Object.keys(FigureTurnState)
-            .map(n => Number.parseInt(n))
-            .filter(n => !Number.isNaN(n)) as unknown as FigureTurnState[];
     }
 }

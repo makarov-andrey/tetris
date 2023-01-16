@@ -1,7 +1,8 @@
-import {EventBus, EventType, FallTickProcessedEvent} from "../EventBus/EventBus";
+import {EventBus, EventType, FallTickProcessedEvent, FiguresSpawnedEvent} from "../EventBus/EventBus";
 import {FigureTurnState} from "../Figures";
 import {Coordinate, FallingFigure, GameData} from "../Common";
 import {CommandBus, CommandType, InitGameCommand} from "../CommandBus/CommandBus";
+import {EnumHelper} from "../Utils/EnumHelper";
 
 export class AlwaysOneFigureSpawner {
     constructor(
@@ -12,7 +13,6 @@ export class AlwaysOneFigureSpawner {
     }
 
     private initHandler(event: InitGameCommand): void {
-        this.addFigure(event.gameData);
         this.eventBus.on(
             EventType.FallingTickProcessed,
             this.processOnFallTick.bind(this),
@@ -30,26 +30,19 @@ export class AlwaysOneFigureSpawner {
 
         const figureIndex = Math.floor(Math.random() * gameData.settings.figures.length);
         const figure = gameData.settings.figures[figureIndex];
-        const turnState = this.getRandTurnState();
+        const turnState = EnumHelper.GetRandom(FigureTurnState);
         const figureMatrix = figure.getTurn(turnState);
         const figureWidth = Math.max(...figureMatrix.map(row => row.length));
         const coordinate = new Coordinate(
             Math.ceil(gameData.settings.fieldWidth / 2 - figureWidth / 2) - 1,
             -figureMatrix.length,
         );
-        gameData.fallingFigures.push(new FallingFigure(
+        const fallingFigure = new FallingFigure(
             figure,
             coordinate,
             turnState
-        ));
-    }
-
-    private getRandTurnState(): FigureTurnState {
-        const keys = Object.keys(FigureTurnState);
-        const enumValues = keys
-            .map(n => Number.parseInt(n))
-            .filter(n => !Number.isNaN(n)) as unknown as FigureTurnState[]
-        const randomIndex = Math.floor(Math.random() * enumValues.length);
-        return enumValues[randomIndex];
+        );
+        gameData.fallingFigures.push(fallingFigure);
+        this.eventBus.fire(new FiguresSpawnedEvent(gameData, [fallingFigure]));
     }
 }

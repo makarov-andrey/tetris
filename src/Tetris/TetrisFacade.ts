@@ -13,55 +13,57 @@ import {GameData} from "./Common";
 import {ComboCounter} from "./ComboCounter/ComboCounter";
 
 export class TetrisFacade {
-    private eventBus = new EventBus();
-    private commandBus = new CommandBus();
-    private gameController = new GameController(
-        new LevelBasedTimingsHandler(2000),
-        this.eventBus,
-        this.commandBus,
-    );
-    private movingHandler = new MovingHandler(
-        this.commandBus,
-        this.eventBus,
-    );
-    private movingController = new MovingController(
-        this.commandBus,
-    );
-    private fallingFiguresProcessor = new RegularFallingFiguresProcessor(
-        this.commandBus,
-        this.eventBus
-    );
-    private figuresSpawner = new AlwaysOneFigureSpawner(
-        this.eventBus,
-        this.commandBus,
-    );
-    private levelCounter = new SquashedRowsCounterBasedLevelCounter(
-        this.eventBus,
-        this.commandBus,
-        8,
-        15,
-    );
-    private comboCounter = new ComboCounter(
-        this.commandBus,
-        this.eventBus,
-    );
-    private scoreCounter = new FallTickScoreCounter(
-        this.commandBus,
-        this.eventBus,
-    );
-    private tableRenderer = new TableRenderer(
-        new TableRendererSettings(
-            document.body,
+    public constructor(
+        private eventBus = new EventBus(),
+        private commandBus = new CommandBus(),
+        private gameController = new GameController(
+            new LevelBasedTimingsHandler(2000),
+            eventBus,
+            commandBus,
         ),
-        this.commandBus,
-        this.eventBus
-    );
-    public gameData = GameData.makeSimple();
+        private movingHandler = new MovingHandler(
+            commandBus,
+            eventBus,
+        ),
+        private movingController = new MovingController(
+            commandBus,
+        ),
+        private fallingFiguresProcessor = new RegularFallingFiguresProcessor(
+            commandBus,
+            eventBus
+        ),
+        private figuresSpawner = new AlwaysOneFigureSpawner(
+            eventBus,
+            commandBus,
+        ),
+        private levelCounter = new SquashedRowsCounterBasedLevelCounter(
+            eventBus,
+            commandBus,
+            8,
+            15,
+        ),
+        private comboCounter = new ComboCounter(
+            commandBus,
+            eventBus,
+        ),
+        private scoreCounter = new FallTickScoreCounter(
+            commandBus,
+            eventBus,
+        ),
+        private tableRenderer = new TableRenderer(
+            new TableRendererSettings(
+                document.body,
+            ),
+            commandBus,
+            eventBus
+        ),
+        public gameData = GameData.makeSimple(),
+    ) {}
 
     public start(gameData?: GameData) {
-        this.gameData = gameData || GameData.makeSimple();
-        this.commandBus.run(new InitGameCommand(this.gameData));
-        this.commandBus.run(new ResumeGameCommand(this.gameData));
+        gameData = gameData || GameData.makeSimple();
+        this.commandBus.run(new InitGameCommand(gameData));
+        this.commandBus.run(new ResumeGameCommand(gameData));
     }
 
     public resume() {

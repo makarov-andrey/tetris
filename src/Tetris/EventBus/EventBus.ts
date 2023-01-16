@@ -5,6 +5,7 @@ export enum EventType {
     GameOver,
     FiguresMoved,
     LevelUp,
+    FiguresSpawned,
 }
 
 export interface Event {
@@ -53,6 +54,17 @@ export class LevelUpEvent implements Event {
 
     public getEventType(): EventType {
         return EventType.LevelUp;
+    }
+}
+
+export class FiguresSpawnedEvent implements Event {
+    constructor(
+        public gameData: GameData,
+        public newFigures: FallingFigure[],
+    ) {}
+
+    public getEventType(): EventType {
+        return EventType.FiguresSpawned;
     }
 }
 
