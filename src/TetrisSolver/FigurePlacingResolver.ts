@@ -1,7 +1,8 @@
 import {Coordinate, FallingFigure, GameData} from "../Tetris/Common";
 import {EnumHelper} from "../Tetris/Utils/EnumHelper";
-import {FigureTurnState} from "../Tetris/Figures";
+import {Figure, FigureTurnState} from "../Tetris/Figures";
 import {FigurePlacingChecker} from "../Tetris/Utils/FigurePlacingChecker";
+import {CommandBus, RenderCommand} from "../Tetris/CommandBus/CommandBus";
 
 class PlaceResolvingError extends Error {
 }
@@ -10,6 +11,10 @@ class GameStateNotSupportedError extends PlaceResolvingError {
 }
 
 export class FigurePlacingResolver {
+    constructor(
+        private commandBus: CommandBus
+    ) {}
+
     public resolveTargetPosition(gameData: GameData): Map<FallingFigure, FallingFigure> {
         if (gameData.fallingFigures.length === 0) {
             return new Map();
@@ -19,8 +24,12 @@ export class FigurePlacingResolver {
         }
         const originalFigure = gameData.fallingFigures[0];
 
+        let enums = EnumHelper.ToArray(FigureTurnState);
+        while (enums[0] !== originalFigure.turnState) {
+            enums.unshift(enums.pop());
+        }
         let matrices: Map<FigureTurnState, boolean[][]> = new Map();
-        EnumHelper.ToArray(FigureTurnState).forEach(turnState => {
+        enums.forEach(turnState => {
             matrices.set(turnState, originalFigure.figure.getTurn(turnState));
         });
         let maxScore = -Infinity;
@@ -29,6 +38,7 @@ export class FigurePlacingResolver {
             new Coordinate(originalFigure.position.x, originalFigure.position.y),
             originalFigure.turnState
         );
+
         matrices.forEach((figureMatrix, turnState) => {
             for (let x = 0; x < gameData.settings.fieldWidth - figureMatrix[0].length + 1; x++) {
                 let [y, imaginableMatrix] = this.imagineFigureDrop(gameData.matrix, figureMatrix, x);
@@ -42,26 +52,63 @@ export class FigurePlacingResolver {
             }
         });
 
+        if ('debugMode' in window && window.debugMode) {
+        // if (true) {
+            let fakeGameData = structuredClone(gameData);
+            theBestTargetFigureState.color = '#f00';
+            fakeGameData.fallingFigures = [theBestTargetFigureState];
+            this.commandBus.run(new RenderCommand(fakeGameData));
+
+            matrices.forEach((figureMatrix, turnState) => {
+                for (let x = 0; x < gameData.settings.fieldWidth - figureMatrix[0].length + 1; x++) {
+                    let [y, imaginableMatrix] = this.imagineFigureDrop(gameData.matrix, figureMatrix, x);
+                    this.calculateScore(gameData, imaginableMatrix, true, new FallingFigure(
+                        originalFigure.figure,
+                        new Coordinate(x, y),
+                        turnState,
+                        '#00f'
+                    ));
+                }
+            });
+
+            matrices.forEach((figureMatrix, turnState) => {
+                for (let x = 0; x < gameData.settings.fieldWidth - figureMatrix[0].length + 1; x++) {
+                    let [y, imaginableMatrix] = this.imagineFigureDrop(gameData.matrix, figureMatrix, x);
+                    this.calculateScore(gameData, imaginableMatrix, true, new FallingFigure(
+                        originalFigure.figure,
+                        new Coordinate(x, y),
+                        turnState,
+                        '#00f'
+                    ));
+                }
+            });
+        }
+
         return new Map([
             [originalFigure, theBestTargetFigureState],
         ]);
     }
 
-    private calculateScore(gameData: GameData, imaginableMatrix: boolean[][]): number {
+    private calculateScore(gameData: GameData, imaginableMatrix: boolean[][], debugMode: boolean = false, fakeFigure: FallingFigure|undefined = undefined): number {
+        if (debugMode && fakeFigure) {
+            let fakeGameData = structuredClone(gameData);
+            fakeGameData.fallingFigures = [fakeFigure];
+            this.commandBus.run(new RenderCommand(fakeGameData));
+        }
         const fieldHeight = gameData.settings.fieldHeight;
         const fieldWidth = gameData.settings.fieldWidth;
         const squashedLinesCount = this.squashLines(imaginableMatrix);
         const squashedLinesScore = squashedLinesCount * 5;
 
-        const [originalHolesCount, _] = this.calculateHoles(gameData.matrix);
-        const [holesCount, holesCoveredHeight] = this.calculateHoles(imaginableMatrix);
+        const originalHolesCount = this.calculateHoles(gameData.matrix);
+        const [holesCount, holesCoveredHeight] = this.calculateHolesAndCoveredHeight(imaginableMatrix, gameData.matrix);
         const holesCountDecrease = originalHolesCount - holesCount;
         let holesScore: number;
-        if (holesCount === 0) {
-            holesScore = (holesCountDecrease > 0 ? holesCountDecrease * 100 : holesCountDecrease * 50);
+        if (holesCoveredHeight === 0 || holesCount === 0) {
+            holesScore = (holesCountDecrease > 0 ? holesCountDecrease * 150 : holesCountDecrease * 70);
         } else {
-            holesScore = (holesCountDecrease > 0 ? holesCountDecrease * 100 : holesCountDecrease * 50)
-                - holesCoveredHeight * Math.pow(holesCoveredHeight, holesCoveredHeight / (fieldHeight * holesCount)) * 3;
+            holesScore = (holesCountDecrease > 0 ? holesCountDecrease * 150 : holesCountDecrease * 70)
+                - holesCoveredHeight * Math.pow(holesCoveredHeight, holesCoveredHeight / (fieldHeight * holesCount)) * 5;
         }
 
         const height = this.calculateHeight(imaginableMatrix);
@@ -78,8 +125,8 @@ export class FigurePlacingResolver {
         if (tunnelsCount === 0) {
             tunnelsScore = 0;
         } else {
-            tunnelsScore = -tunnelsCount * 100
-                - tunnelsSumHeight * Math.pow(tunnelsSumHeight, tunnelsSumHeight / (fieldHeight * tunnelsCount)) * 10;
+            tunnelsScore = -tunnelsCount * 70
+                - tunnelsSumHeight * Math.pow(tunnelsSumHeight, tunnelsSumHeight / (fieldHeight * tunnelsCount)) * 7;
         }
 
         const score = holesScore + squashedLinesScore + heightScore + tunnelsScore + fillableCellsScore;
@@ -125,26 +172,66 @@ export class FigurePlacingResolver {
         return [targetY, imaginableMatrix];
     }
 
-    private calculateHoles(matrix: boolean[][]): [number, number] {
-        let coveredColumnsHeights = new Map<number, number>;
+    private calculateHoles(imaginableMatrix: boolean[][]): number {
+        let coveredColumns = new Set<number>;
+        let holesCount = 0;
+        imaginableMatrix.forEach((row, y) => {
+            row.forEach((val, x) => {
+                if (val) {
+                    coveredColumns.add(x);
+                } else if (coveredColumns.has(x)) {
+                    holesCount++;
+                }
+            });
+        });
+        return holesCount;
+    }
+
+    private calculateHolesAndCoveredHeight(imaginableMatrix: boolean[][], realMatrix: boolean[][]): [number, number] {
+        const [originalTheHighestHoleY, originalTheHighestHoleCoveredY] = this.calculateTheHighestHoleCoveredY(realMatrix);
+        let coveredColumnsYs = new Map<number, number>;
         let holesCoveredHeightsSum = 0;
         let holesCount = 0;
-        matrix.forEach(row => {
+        imaginableMatrix.forEach((row, y) => {
             row.forEach((val, x) => {
-                if (val && !coveredColumnsHeights.has(x)) {
-                    coveredColumnsHeights.set(x, 0);
+                if (val && !coveredColumnsYs.has(x)) {
+                    coveredColumnsYs.set(x, y);
                 }
-                let coveredHeight = coveredColumnsHeights.get(x);
-                if (coveredHeight !== undefined) {
-                    if (!val) {
-                        holesCount++;
-                        holesCoveredHeightsSum += coveredHeight;
+                let coveredY = coveredColumnsYs.get(x);
+                if (coveredY !== undefined && !val) {
+                    holesCount++;
+                    if (originalTheHighestHoleY !== undefined && originalTheHighestHoleCoveredY !== undefined) {
+                        if (y < originalTheHighestHoleY) {
+                            holesCoveredHeightsSum += y - coveredY;
+                        } else if (coveredY < originalTheHighestHoleCoveredY) {
+                            holesCoveredHeightsSum += originalTheHighestHoleCoveredY - coveredY;
+                        }
                     }
-                    coveredColumnsHeights.set(x, coveredHeight + 1)
                 }
             });
         });
         return [holesCount, holesCoveredHeightsSum];
+    }
+
+    private calculateTheHighestHoleCoveredY(matrix: boolean[][]): [number|undefined, number|undefined] {
+        let theHighestHoleCoveredY = undefined;
+        let theHighestHoleY = undefined;
+        let coveredColumnsYs = new Map<number, number>;
+        matrix.some((row, y) => {
+            return row.some((val, x) => {
+                if (val && !coveredColumnsYs.has(x)) {
+                    coveredColumnsYs.set(x, y);
+                }
+                let coveredY = coveredColumnsYs.get(x);
+                if (coveredY !== undefined && !val) {
+                    theHighestHoleY = y;
+                    theHighestHoleCoveredY = coveredY;
+                    return true;
+                }
+                return false;
+            });
+        });
+        return [theHighestHoleY, theHighestHoleCoveredY];
     }
 
     private calculateHeight(matrix: boolean[][]): number {

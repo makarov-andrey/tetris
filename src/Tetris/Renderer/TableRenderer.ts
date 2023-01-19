@@ -1,7 +1,7 @@
 import {CommandBus, CommandType, InitGameCommand, RenderCommand} from "../CommandBus/CommandBus";
 import {EventBus, EventType, FallTickProcessedEvent, GameOverEvent} from "../EventBus/EventBus";
 import {FigurePlacingChecker} from "../Utils/FigurePlacingChecker";
-import {Coordinate, GameData} from "../Common";
+import {Coordinate, FallingFigure, GameData} from "../Common";
 
 export class TableRendererCellColorSettings {
     constructor(
@@ -112,11 +112,7 @@ export class TableRenderer {
 
     private renderFallingFigures(gameData: GameData): void {
         gameData.fallingFigures.forEach(fallingFigure => {
-            this.repaintFallingFiguresCells(
-                fallingFigure.figure.getTurn(fallingFigure.turnState),
-                fallingFigure.position,
-                gameData
-            );
+            this.repaintFallingFiguresCells(fallingFigure, gameData);
         });
     }
 
@@ -152,7 +148,7 @@ export class TableRenderer {
         this.repaintCells(matrix, indent, colors);
     }
 
-    private repaintFallingFiguresCells(matrix: boolean[][], indent: Coordinate, gameData: GameData): void {
+    private repaintFallingFiguresCells(fallingFigure: FallingFigure, gameData: GameData): void {
         let colors: CellColors;
         if (gameData.isGameOver) {
             colors = new CellColors(
@@ -161,11 +157,15 @@ export class TableRenderer {
             );
         } else {
             colors = new CellColors(
-                this.renderSettings.fallingFigureCellColors.filled,
+                fallingFigure.color || this.renderSettings.fallingFigureCellColors.filled,
                 this.renderSettings.fallingFigureCellColors.empty,
             );
         }
-        this.repaintCells(matrix, indent, colors);
+        this.repaintCells(
+            fallingFigure.figure.getTurn(fallingFigure.turnState),
+            fallingFigure.position,
+            colors
+        );
     }
 
     private repaintProjectionFiguresCells(matrix: boolean[][], indent: Coordinate, gameData: GameData): void {

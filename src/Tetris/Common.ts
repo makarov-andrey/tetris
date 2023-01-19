@@ -16,6 +16,7 @@ export class FallingFigure {
         public figure: Figure,
         public position: Coordinate,
         public turnState: FigureTurnState,
+        public color: string|undefined = undefined,
     ) {}
 }
 

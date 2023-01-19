@@ -7,7 +7,7 @@ export class TetrisSolver {
     constructor(
         private eventBus: EventBus,
         private commandBus: CommandBus,
-        private fallingFigurePlacingResolver = new FigurePlacingResolver(),
+        private fallingFigurePlacingResolver = new FigurePlacingResolver(commandBus),
         private fallingFiguresPlacer = new FigurePlacingPerformer(commandBus),
     ) {
         this.commandBus.addHandler(CommandType.InitGame, this.initGameHandler.bind(this));

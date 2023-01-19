@@ -11,13 +11,15 @@ import {FallTickScoreCounter} from "./ScoreCounter/FallTickScoreCounter";
 import {SquashedRowsCounterBasedLevelCounter} from "./LevelCounter/SquashedRowsCounterBasedLevelCounter";
 import {GameData} from "./Common";
 import {ComboCounter} from "./ComboCounter/ComboCounter";
+import {ConstTimingsHandler} from "./TimingsHandler/ConstTimingsHandler";
 
 export class TetrisFacade {
     public constructor(
         private eventBus = new EventBus(),
         private commandBus = new CommandBus(),
         private gameController = new GameController(
-            new LevelBasedTimingsHandler(2000),
+            // new LevelBasedTimingsHandler(2000),
+            new ConstTimingsHandler(2000),
             eventBus,
             commandBus,
         ),

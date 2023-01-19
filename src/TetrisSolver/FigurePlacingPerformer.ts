@@ -56,9 +56,12 @@ export class FigurePlacingPerformer {
             return;
         }
 
-        this.nextMoveTimeoutId = setTimeout(
-            this.processTick.bind(this),
-            this.timingsHandler.getDelayForNextTickMs(this.gameData),
-        );
+        this.processTick();
+
+        // this.nextMoveTimeoutId = setTimeout(
+        //     this.processTick.bind(this),
+        //     0,
+        //     this.timingsHandler.getDelayForNextTickMs(this.gameData),
+        // );
     }
 }
