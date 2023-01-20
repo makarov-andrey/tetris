@@ -1,6 +1,7 @@
-import {FallingFigure, GameData} from "../Tetris/Common";
+import {GameData} from "../Tetris/Common";
 import {CommandBus, DropFiguresCommand, MoveLeftCommand, MoveRightCommand, TurnClockwiseCommand} from "../Tetris/CommandBus/CommandBus";
 import {LevelBasedTimingsHandler} from "../Tetris/TimingsHandler/LevelBasedTimingsHandler";
+import {FigurePlacingResult} from "./Common";
 
 class PlacingError extends Error {}
 class GameStateNotSupportedError extends PlacingError {}
@@ -8,7 +9,7 @@ class InconsistentTargetStateError extends PlacingError {}
 
 export class FigurePlacingPerformer {
     private nextMoveTimeoutId: ReturnType<typeof setTimeout> = setTimeout(() => {});
-    private targetFallingFiguresStates: Map<FallingFigure, FallingFigure> = new Map();
+    private targetState: FigurePlacingResult|undefined;
     private gameData: GameData = GameData.makeSimple();
 
     constructor(
@@ -16,9 +17,9 @@ export class FigurePlacingPerformer {
         private timingsHandler = new LevelBasedTimingsHandler(100, 0.9),
     ) {}
 
-    public place(gameData: GameData, targetFallingFiguresStates: Map<FallingFigure, FallingFigure>) {
+    public place(gameData: GameData, targetState: FigurePlacingResult|undefined) {
         this.gameData = gameData;
-        this.targetFallingFiguresStates = targetFallingFiguresStates;
+        this.targetState = targetState;
         clearTimeout(this.nextMoveTimeoutId);
         this.nextMoveTimeoutId = setTimeout(
             this.processTick.bind(this),
@@ -33,8 +34,11 @@ export class FigurePlacingPerformer {
         if (this.gameData.fallingFigures.length !== 1) {
             throw new GameStateNotSupportedError();
         }
+        if (this.targetState === undefined) {
+            return;
+        }
         const originalFigure = this.gameData.fallingFigures[0];
-        const targetFigure = this.targetFallingFiguresStates.get(originalFigure);
+        const targetFigure = this.targetState.figuresTargetStates.get(originalFigure);
         if (!targetFigure) {
             return;
         }
@@ -57,11 +61,10 @@ export class FigurePlacingPerformer {
         }
 
         // this.processTick();
-
         this.nextMoveTimeoutId = setTimeout(
             this.processTick.bind(this),
-            0,
-            // this.timingsHandler.getDelayForNextTickMs(this.gameData),
+            // 0,
+            this.timingsHandler.getDelayForNextTickMs(this.gameData),
         );
     }
 }

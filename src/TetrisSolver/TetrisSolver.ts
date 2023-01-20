@@ -2,12 +2,16 @@ import {EventBus, EventType, FiguresSpawnedEvent} from "../Tetris/EventBus/Event
 import {CommandBus, CommandType, InitGameCommand} from "../Tetris/CommandBus/CommandBus";
 import {FigurePlacingResolver} from "./FigurePlacingResolver";
 import {FigurePlacingPerformer} from "./FigurePlacingPerformer";
+import {ScoreCalculator} from "./ScoreCalculator";
 
 export class TetrisSolver {
     constructor(
         private eventBus: EventBus,
         private commandBus: CommandBus,
-        private fallingFigurePlacingResolver = new FigurePlacingResolver(commandBus),
+        private fallingFigurePlacingResolver = new FigurePlacingResolver(
+            commandBus,
+            new ScoreCalculator(),
+        ),
         private fallingFiguresPlacer = new FigurePlacingPerformer(commandBus),
     ) {
         this.commandBus.addHandler(CommandType.InitGame, this.initGameHandler.bind(this));
@@ -18,7 +22,7 @@ export class TetrisSolver {
     }
 
     private onFiguresSpawned(event: FiguresSpawnedEvent) {
-        const targetFallingFiguresStates = this.fallingFigurePlacingResolver.resolveTargetPosition(event.gameData);
+        const targetFallingFiguresStates = this.fallingFigurePlacingResolver.resolve(event.gameData);
         this.fallingFiguresPlacer.place(event.gameData, targetFallingFiguresStates);
     }
 }
