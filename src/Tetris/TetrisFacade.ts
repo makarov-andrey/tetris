@@ -12,6 +12,7 @@ import {SquashedRowsCounterBasedLevelCounter} from "./LevelCounter/SquashedRowsC
 import {GameData} from "./Common";
 import {ComboCounter} from "./ComboCounter/ComboCounter";
 import {ConstTimingsHandler} from "./TimingsHandler/ConstTimingsHandler";
+import {StatsCounter} from "./StatsCounter/StatsCounter";
 
 export class TetrisFacade {
     public constructor(
@@ -49,6 +50,10 @@ export class TetrisFacade {
             eventBus,
         ),
         private scoreCounter = new FallTickScoreCounter(
+            commandBus,
+            eventBus,
+        ),
+        private statsCounter = new StatsCounter(
             commandBus,
             eventBus,
         ),

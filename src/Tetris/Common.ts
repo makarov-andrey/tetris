@@ -28,6 +28,11 @@ export class GameSettings {
     ) {}
 }
 
+export class Stats {
+    public figuresFallen = 0;
+    public linesSquashed = 0;
+}
+
 export class GameData {
     constructor(
         public isInitialized: boolean = false,
@@ -40,6 +45,7 @@ export class GameData {
         public level: number = 1,
         public score: number = 0,
         public combo: number = 0,
+        public stats: Stats = new Stats(),
     ) {}
 
     static makeSimple(width: number = 10, height: number = 20): GameData {
@@ -64,6 +70,6 @@ export class GameData {
                     new RZFigure(),
                 ],
             ),
-        )
+        );
     }
 }

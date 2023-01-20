@@ -75,6 +75,8 @@ export class TableRenderer {
                 Level: <span id="level"></span><br>
                 Score: <span id="score"></span><br>
                 Combo: <span id="combo"></span><br>
+                Figures fallen: <span id="figures_fallen"></span><br>
+                Lines squashed: <span id="lines_squashed"></span><br>
             </div>`);
         this.renderSettings.containerElement.appendChild(this.scoreDisplay);
 
@@ -205,6 +207,8 @@ export class TableRenderer {
         const levelSpan = document.getElementById('level');
         const scoreSpan = document.getElementById('score');
         const comboSpan = document.getElementById('combo');
+        const figuresFallen = document.getElementById('figures_fallen');
+        const linesSquashed = document.getElementById('lines_squashed');
         if (levelSpan !== null) {
             levelSpan.innerHTML = gameData.level.toString();
         }
@@ -213,6 +217,12 @@ export class TableRenderer {
         }
         if (comboSpan !== null) {
             comboSpan.innerHTML = gameData.combo.toString();
+        }
+        if (figuresFallen !== null) {
+            figuresFallen.innerHTML = gameData.stats.figuresFallen.toString();
+        }
+        if (linesSquashed !== null) {
+            linesSquashed.innerHTML = gameData.stats.linesSquashed.toString();
         }
     }
 
