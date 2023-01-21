@@ -1,14 +1,14 @@
 import {GameData} from "../Tetris/Common";
+import {Hole} from "./HolesHelper";
 
 export class ScoreCalculator {
-    public calculateScore(gameData: GameData, matrix: boolean[][], squashedLinesCount: number): number {
+    public calculateScore(gameData: GameData, matrix: boolean[][], squashedLinesCount: number, originalMatrixHoles: Hole[]): number {
         const fieldHeight = gameData.settings.fieldHeight;
         const fieldWidth = gameData.settings.fieldWidth;
         const squashedLinesScore = squashedLinesCount * 5;
 
-        const originalHolesCount = this.calculateHoles(gameData.matrix);
         const [holesCount, holesCoveredHeight] = this.calculateHolesAndCoveredHeight(matrix, gameData.matrix);
-        const holesCountDecrease = originalHolesCount - holesCount;
+        const holesCountDecrease = originalMatrixHoles.length - holesCount;
         let holesScore: number;
         if (holesCoveredHeight === 0 || holesCount === 0) {
             holesScore = (holesCountDecrease > 0 ? holesCountDecrease * 150 : holesCountDecrease * 70);

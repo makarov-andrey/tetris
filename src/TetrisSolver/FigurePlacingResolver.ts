@@ -4,7 +4,8 @@ import {FigureTurnState} from "../Tetris/Figures";
 import {FigurePlacingChecker} from "../Tetris/Utils/FigurePlacingChecker";
 import {CommandBus, RenderCommand} from "../Tetris/CommandBus/CommandBus";
 import {ScoreCalculator} from "./ScoreCalculator";
-import {DropPlacingStep, FigurePlacingResult, FigurePlacingStep, MoveXPlacingStep, TurnPlacingStep} from "./Common";
+import {DropPlacingStep, FigurePlacingResult, FigurePlacingStep, MoveXPlacingStep, MoveYPlacingStep, TurnPlacingStep} from "./Common";
+import {HolesHelper} from "./HolesHelper";
 
 class PlaceResolvingError extends Error {
 }
@@ -16,6 +17,7 @@ export class FigurePlacingResolver {
     constructor(
         private commandBus: CommandBus,
         private scoreCalculator: ScoreCalculator,
+        private holesHelper: HolesHelper,
     ) {}
 
     public resolve(gameData: GameData): FigurePlacingResult|undefined {
@@ -40,6 +42,7 @@ export class FigurePlacingResolver {
             }
         })
 
+        // let debugMode = true;
         let debugMode = 'debugMode' in window && window.debugMode;
         let imaginableFigure = theBestResult.figuresTargetStates.get(originalFigure);
         if (debugMode && imaginableFigure !== undefined) {
@@ -80,6 +83,8 @@ export class FigurePlacingResolver {
             }
         });
 
+        const originalMatrixHoles = this.holesHelper.collectHoles(gameData.matrix);
+
         matrices.forEach((figureMatrix, turnState) => {
             for (let x = 0; x < gameData.settings.fieldWidth - figureMatrix[0].length + 1; x++) {
                 let [y, imaginableMatrix] = this.imagineFigureDrop(gameData.matrix, figureMatrix, x);
@@ -89,30 +94,40 @@ export class FigurePlacingResolver {
                 if (onBeforeScoreCalculates) {
                     onBeforeScoreCalculates(imaginableFigure);
                 }
-                let score = this.scoreCalculator.calculateScore(gameData, imaginableMatrix, squashedLinesCount);
-                let directions = this.makeSimplePlacingSteps(originalFigure, imaginableFigure);
+                let score = this.scoreCalculator.calculateScore(gameData, imaginableMatrix, squashedLinesCount, originalMatrixHoles);
+                let directions = this.makeSimplePlacingSteps(imaginableFigure);
                 if (onAfterScoreCalculates) {
                     onAfterScoreCalculates(imaginableFigure, score, directions);
                 }
             }
         });
 
-        const openHoles = this.collectOpenHoles(gameData.matrix);
-        openHoles.forEach(([topLeftCoordinate, bottomRightCoordinate]: [Coordinate, Coordinate]) => {
+        originalMatrixHoles.filter(hole => hole.isOpened && hole.cells.length > 0).forEach(hole => {
+            let topY = gameData.settings.fieldHeight,
+                leftX = gameData.settings.fieldWidth,
+                bottomY = -1,
+                rightX = -1;
+            hole.cells.forEach(cell => {
+                topY = Math.min(topY, cell.y);
+                leftX = Math.min(leftX, cell.x);
+                bottomY = Math.max(bottomY, cell.y);
+                rightX = Math.max(rightX, cell.x);
+            });
+
             matrices.forEach((figureMatrix, turnState) => {
-                for (let y = Math.min(topLeftCoordinate.y - figureMatrix.length, 0); y++; y <= bottomRightCoordinate.y) {
-                    for (let x = Math.min(topLeftCoordinate.x - figureMatrix[0].length, 0); x++; x <= bottomRightCoordinate.x) {
+                for (let y = Math.max(topY - figureMatrix.length + 1, 0); y <= bottomY; y++) {
+                    for (let x = Math.max(leftX - figureMatrix[0].length + 1, 0); x <= rightX; x++) {
                         let coordinate = new Coordinate(x, y);
+                        let imaginableFigure = new FallingFigure(originalFigure.figure, coordinate, turnState);
+                        if (onBeforeScoreCalculates) {
+                            onBeforeScoreCalculates(imaginableFigure);
+                        }
                         if (FigurePlacingChecker.canFigureBePlaced(figureMatrix, coordinate, gameData.matrix)) {
-                            let imaginableFigure = new FallingFigure(originalFigure.figure, coordinate, turnState);
-                            let directions = this.makePushInPlacingSteps(gameData, originalFigure, imaginableFigure);
+                            let directions = this.makePushInPlacingSteps(gameData, imaginableFigure);
                             if (directions !== undefined) {
                                 let imaginableMatrix = this.imagineFigurePlacing(gameData.matrix, figureMatrix, coordinate);
                                 let squashedLinesCount = this.squashLines(imaginableMatrix);
-                                if (onBeforeScoreCalculates) {
-                                    onBeforeScoreCalculates(imaginableFigure);
-                                }
-                                let score = this.scoreCalculator.calculateScore(gameData, imaginableMatrix, squashedLinesCount);
+                                let score = this.scoreCalculator.calculateScore(gameData, imaginableMatrix, squashedLinesCount, originalMatrixHoles);
                                 if (onAfterScoreCalculates) {
                                     onAfterScoreCalculates(imaginableFigure, score, directions);
                                 }
@@ -167,18 +182,27 @@ export class FigurePlacingResolver {
         return imaginableMatrix;
     }
 
-    private collectOpenHoles(matrix: boolean[][]): [Coordinate, Coordinate][] {
-        return [];
-    }
+    private makePushInPlacingSteps(gameData: GameData, imaginableFigure: FallingFigure): FigurePlacingStep[]|undefined {
+        let figureMatrix = imaginableFigure.figure.getTurn(imaginableFigure.turnState);
+        let coveredColumns = this.holesHelper.collectCoveredColumns(gameData.matrix, imaginableFigure.position.y - 1);
+        let targetX = this.holesHelper.findTheWayOutFromHole(gameData.matrix, imaginableFigure.position, coveredColumns, figureMatrix);
+        if (targetX === undefined) {
+            return undefined;
+        }
 
-    private makePushInPlacingSteps(gameData: GameData, originalFigure: FallingFigure, imaginableFigure: FallingFigure): FigurePlacingStep[]|undefined {
-        return undefined;
-    }
-
-    private makeSimplePlacingSteps(originalFigure: FallingFigure, imaginableFigure: FallingFigure): FigurePlacingStep[] {
         return [
-            new TurnPlacingStep(imaginableFigure.turnState),
-            new MoveXPlacingStep(imaginableFigure.position.x),
+            new TurnPlacingStep(imaginableFigure.turnState, true),
+            new MoveXPlacingStep(targetX, false),
+            new MoveYPlacingStep(imaginableFigure.position.y),
+            new MoveXPlacingStep(imaginableFigure.position.x, true),
+            new DropPlacingStep(),
+        ];
+    }
+
+    private makeSimplePlacingSteps(imaginableFigure: FallingFigure): FigurePlacingStep[] {
+        return [
+            new TurnPlacingStep(imaginableFigure.turnState, true),
+            new MoveXPlacingStep(imaginableFigure.position.x, true),
             new DropPlacingStep(),
         ];
     }

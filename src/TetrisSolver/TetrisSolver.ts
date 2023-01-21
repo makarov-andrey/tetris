@@ -3,6 +3,7 @@ import {CommandBus, CommandType, InitGameCommand} from "../Tetris/CommandBus/Com
 import {FigurePlacingResolver} from "./FigurePlacingResolver";
 import {FigurePlacingPerformer} from "./FigurePlacingPerformer";
 import {ScoreCalculator} from "./ScoreCalculator";
+import {HolesHelper} from "./HolesHelper";
 
 export class TetrisSolver {
     constructor(
@@ -11,6 +12,7 @@ export class TetrisSolver {
         private fallingFigurePlacingResolver = new FigurePlacingResolver(
             commandBus,
             new ScoreCalculator(),
+            new HolesHelper(),
         ),
         private fallingFiguresPlacer = new FigurePlacingPerformer(commandBus),
     ) {

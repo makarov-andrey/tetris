@@ -1,27 +1,47 @@
 import {FallingFigure} from "../Tetris/Common";
 import {FigureTurnState} from "../Tetris/Figures";
 
-export interface FigurePlacingStep {}
+export interface FigurePlacingStep {
+    get persisted(): boolean,
+}
 
 export class TurnPlacingStep implements FigurePlacingStep{
     constructor(
-        public target: FigureTurnState
+        public target: FigureTurnState,
+        private _persisted: boolean,
     ) {}
+
+    get persisted(): boolean {
+        return this._persisted;
+    }
 }
 
 export class MoveXPlacingStep implements FigurePlacingStep{
     constructor(
-        public target: number
+        public target: number,
+        private _persisted: boolean,
     ) {}
+
+    get persisted(): boolean {
+        return this._persisted;
+    }
 }
 
 export class MoveYPlacingStep implements FigurePlacingStep{
     constructor(
-        public target: number
+        public target: number,
     ) {}
+
+    get persisted(): boolean {
+        return false;
+    }
 }
 
-export class DropPlacingStep implements FigurePlacingStep{}
+export class DropPlacingStep implements FigurePlacingStep{
+    get persisted(): boolean {
+        return false;
+    }
+}
 
 export class FigurePlacingResult {
     constructor(
