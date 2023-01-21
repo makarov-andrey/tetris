@@ -70,8 +70,14 @@ export class FigurePlacingResolver {
             enums.unshift(enums.pop());
         }
         let matrices: Map<FigureTurnState, boolean[][]> = new Map();
+        let stringyMatrices: Set<string> = new Set();
         enums.forEach(turnState => {
-            matrices.set(turnState, originalFigure.figure.getTurn(turnState));
+            let figureMatrix = originalFigure.figure.getTurn(turnState);
+            let stringyFigureMatrix = figureMatrix.map(row => row.map(val => val ? "1" : "0").join()).join("\n");
+            if (!stringyMatrices.has(stringyFigureMatrix)) {
+                stringyMatrices.add(stringyFigureMatrix);
+                matrices.set(turnState, figureMatrix);
+            }
         });
 
         matrices.forEach((figureMatrix, turnState) => {
@@ -161,8 +167,7 @@ export class FigurePlacingResolver {
         return imaginableMatrix;
     }
 
-    private collectOpenHoles(matrix: boolean[][]): [Coordinate, Coordinate][]
-    {
+    private collectOpenHoles(matrix: boolean[][]): [Coordinate, Coordinate][] {
         return [];
     }
 
