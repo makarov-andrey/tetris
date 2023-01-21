@@ -4,7 +4,7 @@ import {FigureTurnState} from "../Tetris/Figures";
 import {FigurePlacingChecker} from "../Tetris/Utils/FigurePlacingChecker";
 import {CommandBus, RenderCommand} from "../Tetris/CommandBus/CommandBus";
 import {ScoreCalculator} from "./ScoreCalculator";
-import {FigurePlacingResult, PushInDirection} from "./Common";
+import {DropPlacingStep, FigurePlacingResult, FigurePlacingStep, MoveXPlacingStep, TurnPlacingStep} from "./Common";
 
 class PlaceResolvingError extends Error {
 }
@@ -28,29 +28,29 @@ export class FigurePlacingResolver {
         const originalFigure = gameData.fallingFigures[0];
 
         let maxScore = -Infinity;
-        let theBestResult = new FigurePlacingResult(new Map(), undefined);
+        let theBestResult = new FigurePlacingResult(new Map(), []);
 
-        this.processStates(gameData, (fakeFigure: FallingFigure, score: number, pushInDirection: PushInDirection|undefined) => {
+        this.processStates(gameData, (imaginableFigure: FallingFigure, score: number, placingDirections: FigurePlacingStep[]) => {
             if (score > maxScore) {
                 maxScore = score;
                 theBestResult = new FigurePlacingResult(
-                    new Map([[originalFigure, fakeFigure]]),
-                    pushInDirection
+                    new Map([[originalFigure, imaginableFigure]]),
+                    placingDirections
                 );
             }
         })
 
         let debugMode = 'debugMode' in window && window.debugMode;
-        let fakeFigure = theBestResult.figuresTargetStates.get(originalFigure);
-        if (debugMode && fakeFigure !== undefined) {
+        let imaginableFigure = theBestResult.figuresTargetStates.get(originalFigure);
+        if (debugMode && imaginableFigure !== undefined) {
             let fakeGameData = structuredClone(gameData);
-            fakeFigure.color = '#f00';
-            fakeGameData.fallingFigures = [fakeFigure];
+            imaginableFigure.color = '#f00';
+            fakeGameData.fallingFigures = [imaginableFigure];
             this.commandBus.run(new RenderCommand(fakeGameData));
 
-            this.processStates(gameData, (fakeFigure: FallingFigure, score: number, pushInDirection: PushInDirection|undefined) => {
-                fakeFigure.color = '#00f';
-                fakeGameData.fallingFigures = [fakeFigure];
+            this.processStates(gameData, undefined, (imaginableFigure: FallingFigure) => {
+                imaginableFigure.color = '#00f';
+                fakeGameData.fallingFigures = [imaginableFigure];
                 this.commandBus.run(new RenderCommand(fakeGameData));
             })
         }
@@ -58,7 +58,11 @@ export class FigurePlacingResolver {
         return theBestResult;
     }
 
-    private processStates(gameData: GameData, callback: (fakeFigure: FallingFigure, score: number, pushInDirection: PushInDirection|undefined) => void) {
+    private processStates(
+        gameData: GameData,
+        onAfterScoreCalculates?: (imaginableFigure: FallingFigure, score: number, placingDirections: FigurePlacingStep[]) => void,
+        onBeforeScoreCalculates?: (imaginableFigure: FallingFigure) => void,
+    ) {
         const originalFigure = gameData.fallingFigures[0];
 
         let enums = EnumHelper.ToArray(FigureTurnState);
@@ -73,25 +77,44 @@ export class FigurePlacingResolver {
         matrices.forEach((figureMatrix, turnState) => {
             for (let x = 0; x < gameData.settings.fieldWidth - figureMatrix[0].length + 1; x++) {
                 let [y, imaginableMatrix] = this.imagineFigureDrop(gameData.matrix, figureMatrix, x);
+                let coordinate = new Coordinate(x, y);
                 let squashedLinesCount = this.squashLines(imaginableMatrix);
+                let imaginableFigure = new FallingFigure(originalFigure.figure, coordinate, turnState);
+                if (onBeforeScoreCalculates) {
+                    onBeforeScoreCalculates(imaginableFigure);
+                }
                 let score = this.scoreCalculator.calculateScore(gameData, imaginableMatrix, squashedLinesCount);
-                let fakeFigure = new FallingFigure(originalFigure.figure, new Coordinate(x, y), turnState);
-                callback(fakeFigure, score, undefined);
+                let directions = this.makeSimplePlacingSteps(originalFigure, imaginableFigure);
+                if (onAfterScoreCalculates) {
+                    onAfterScoreCalculates(imaginableFigure, score, directions);
+                }
             }
         });
 
-        matrices.forEach((figureMatrix, turnState) => {
-            for (let x = 0; x < gameData.settings.fieldWidth - figureMatrix[0].length + 1; x++) {
-                let imaginableResult = this.imagineFigurePushIn(gameData.matrix, figureMatrix, x);
-                if (imaginableResult === undefined) {
-                    continue;
+        const openHoles = this.collectOpenHoles(gameData.matrix);
+        openHoles.forEach(([topLeftCoordinate, bottomRightCoordinate]: [Coordinate, Coordinate]) => {
+            matrices.forEach((figureMatrix, turnState) => {
+                for (let y = Math.min(topLeftCoordinate.y - figureMatrix.length, 0); y++; y <= bottomRightCoordinate.y) {
+                    for (let x = Math.min(topLeftCoordinate.x - figureMatrix[0].length, 0); x++; x <= bottomRightCoordinate.x) {
+                        let coordinate = new Coordinate(x, y);
+                        if (FigurePlacingChecker.canFigureBePlaced(figureMatrix, coordinate, gameData.matrix)) {
+                            let imaginableFigure = new FallingFigure(originalFigure.figure, coordinate, turnState);
+                            let directions = this.makePushInPlacingSteps(gameData, originalFigure, imaginableFigure);
+                            if (directions !== undefined) {
+                                let imaginableMatrix = this.imagineFigurePlacing(gameData.matrix, figureMatrix, coordinate);
+                                let squashedLinesCount = this.squashLines(imaginableMatrix);
+                                if (onBeforeScoreCalculates) {
+                                    onBeforeScoreCalculates(imaginableFigure);
+                                }
+                                let score = this.scoreCalculator.calculateScore(gameData, imaginableMatrix, squashedLinesCount);
+                                if (onAfterScoreCalculates) {
+                                    onAfterScoreCalculates(imaginableFigure, score, directions);
+                                }
+                            }
+                        }
+                    }
                 }
-                let [y, imaginableMatrix, pushInDirection] = imaginableResult;
-                let squashedLinesCount = this.squashLines(imaginableMatrix);
-                let score = this.scoreCalculator.calculateScore(gameData, imaginableMatrix, squashedLinesCount);
-                let fakeFigure = new FallingFigure(originalFigure.figure, new Coordinate(x, y), turnState);
-                callback(fakeFigure, score, pushInDirection);
-            }
+            });
         });
     }
 
@@ -111,15 +134,22 @@ export class FigurePlacingResolver {
     }
 
     private imagineFigureDrop(gameMatrix: boolean[][], figureMatrix: boolean[][], targetX: number): [number, boolean[][]] {
-        let imaginableMatrix: boolean[][] = structuredClone(gameMatrix);
         let targetY = -figureMatrix.length;
         while (FigurePlacingChecker.canFigureBePlaced(figureMatrix, new Coordinate(targetX, targetY + 1), gameMatrix)) {
             targetY++;
         }
+        return [
+            targetY,
+            this.imagineFigurePlacing(gameMatrix, figureMatrix, new Coordinate(targetX, targetY)),
+        ];
+    }
+
+    private imagineFigurePlacing(gameMatrix: boolean[][], figureMatrix: boolean[][], targetCoordinate: Coordinate): boolean[][] {
+        let imaginableMatrix: boolean[][] = structuredClone(gameMatrix);
         figureMatrix.forEach((row, figureY) => {
             row.forEach((val, figureX) => {
-                const realY = targetY + figureY;
-                const realX = targetX + figureX;
+                const realY = targetCoordinate.y + figureY;
+                const realX = targetCoordinate.x + figureX;
                 if (realY in imaginableMatrix
                     && realX in imaginableMatrix[realY]
                     && val
@@ -128,10 +158,23 @@ export class FigurePlacingResolver {
                 }
             })
         });
-        return [targetY, imaginableMatrix];
+        return imaginableMatrix;
     }
 
-    private imagineFigurePushIn(matrix: boolean[][], figureMatrix: boolean[][], x: number): [number, boolean[][], PushInDirection]|undefined {
+    private collectOpenHoles(matrix: boolean[][]): [Coordinate, Coordinate][]
+    {
+        return [];
+    }
+
+    private makePushInPlacingSteps(gameData: GameData, originalFigure: FallingFigure, imaginableFigure: FallingFigure): FigurePlacingStep[]|undefined {
         return undefined;
+    }
+
+    private makeSimplePlacingSteps(originalFigure: FallingFigure, imaginableFigure: FallingFigure): FigurePlacingStep[] {
+        return [
+            new TurnPlacingStep(imaginableFigure.turnState),
+            new MoveXPlacingStep(imaginableFigure.position.x),
+            new DropPlacingStep(),
+        ];
     }
 }
