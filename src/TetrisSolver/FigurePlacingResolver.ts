@@ -3,9 +3,10 @@ import {EnumHelper} from "../Tetris/Utils/EnumHelper";
 import {FigureTurnState} from "../Tetris/Figures";
 import {FigurePlacingChecker} from "../Tetris/Utils/FigurePlacingChecker";
 import {CommandBus, RenderCommand} from "../Tetris/CommandBus/CommandBus";
-import {ScoreCalculator} from "./ScoreCalculator";
 import {DropPlacingStep, FigurePlacingResult, FigurePlacingStep, MoveXPlacingStep, MoveYPlacingStep, TurnPlacingStep} from "./Common";
-import {HolesHelper} from "./HolesHelper";
+import {CalculatorAggregate} from "./ScoreCalculator/CalculatorAggregate";
+import {HolesHelper} from "./Utils/HolesHelper";
+import {CalculateScoreRequest} from "./ScoreCalculator/ScoreCalculatorInterface";
 
 class PlaceResolvingError extends Error {
 }
@@ -16,8 +17,7 @@ class GameStateNotSupportedError extends PlaceResolvingError {
 export class FigurePlacingResolver {
     constructor(
         private commandBus: CommandBus,
-        private scoreCalculator: ScoreCalculator,
-        private holesHelper: HolesHelper,
+        private scoreCalculator: CalculatorAggregate,
     ) {}
 
     public resolve(gameData: GameData): FigurePlacingResult|undefined {
@@ -83,7 +83,8 @@ export class FigurePlacingResolver {
             }
         });
 
-        const originalMatrixHoles = this.holesHelper.collectHoles(gameData.matrix);
+        const originalMatrixHoles = HolesHelper.collectHoles(gameData.matrix);
+        const originalCoveredColumns = HolesHelper.collectCoveredColumns(gameData.matrix);
 
         matrices.forEach((figureMatrix, turnState) => {
             for (let x = 0; x < gameData.settings.fieldWidth - figureMatrix[0].length + 1; x++) {
@@ -94,7 +95,16 @@ export class FigurePlacingResolver {
                 if (onBeforeScoreCalculates) {
                     onBeforeScoreCalculates(imaginableFigure);
                 }
-                let score = this.scoreCalculator.calculateScore(gameData, imaginableMatrix, squashedLinesCount, originalMatrixHoles);
+                let imaginableCoveredColumns = HolesHelper.collectCoveredColumns(imaginableMatrix);
+                let calculateScoreRequest = new CalculateScoreRequest(
+                    gameData,
+                    originalMatrixHoles,
+                    originalCoveredColumns,
+                    imaginableMatrix,
+                    imaginableCoveredColumns,
+                    squashedLinesCount
+                );
+                let score = this.scoreCalculator.calculateScore(calculateScoreRequest);
                 let directions = this.makeSimplePlacingSteps(imaginableFigure);
                 if (onAfterScoreCalculates) {
                     onAfterScoreCalculates(imaginableFigure, score, directions);
@@ -123,11 +133,20 @@ export class FigurePlacingResolver {
                             onBeforeScoreCalculates(imaginableFigure);
                         }
                         if (FigurePlacingChecker.canFigureBePlaced(figureMatrix, coordinate, gameData.matrix)) {
-                            let directions = this.makePushInPlacingSteps(gameData, imaginableFigure);
+                            let directions = this.makePushInPlacingSteps(gameData, imaginableFigure, originalCoveredColumns);
                             if (directions !== undefined) {
                                 let imaginableMatrix = this.imagineFigurePlacing(gameData.matrix, figureMatrix, coordinate);
                                 let squashedLinesCount = this.squashLines(imaginableMatrix);
-                                let score = this.scoreCalculator.calculateScore(gameData, imaginableMatrix, squashedLinesCount, originalMatrixHoles);
+                                let imaginableCoveredColumns = HolesHelper.collectCoveredColumns(imaginableMatrix);
+                                let calculateScoreRequest = new CalculateScoreRequest(
+                                    gameData,
+                                    originalMatrixHoles,
+                                    originalCoveredColumns,
+                                    imaginableMatrix,
+                                    imaginableCoveredColumns,
+                                    squashedLinesCount
+                                );
+                                let score = this.scoreCalculator.calculateScore(calculateScoreRequest);
                                 if (onAfterScoreCalculates) {
                                     onAfterScoreCalculates(imaginableFigure, score, directions);
                                 }
@@ -182,10 +201,9 @@ export class FigurePlacingResolver {
         return imaginableMatrix;
     }
 
-    private makePushInPlacingSteps(gameData: GameData, imaginableFigure: FallingFigure): FigurePlacingStep[]|undefined {
+    private makePushInPlacingSteps(gameData: GameData, imaginableFigure: FallingFigure, originalCoveredColumns: Map<number, number>): FigurePlacingStep[] | undefined {
         let figureMatrix = imaginableFigure.figure.getTurn(imaginableFigure.turnState);
-        let coveredColumns = this.holesHelper.collectCoveredColumns(gameData.matrix, imaginableFigure.position.y - 1);
-        let targetX = this.holesHelper.findTheWayOutFromHole(gameData.matrix, imaginableFigure.position, coveredColumns, figureMatrix);
+        let targetX = HolesHelper.findTheWayOutFromHole(gameData.matrix, imaginableFigure.position, originalCoveredColumns, figureMatrix);
         if (targetX === undefined) {
             return undefined;
         }

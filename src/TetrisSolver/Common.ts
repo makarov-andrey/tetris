@@ -1,4 +1,4 @@
-import {FallingFigure} from "../Tetris/Common";
+import {Coordinate, FallingFigure} from "../Tetris/Common";
 import {FigureTurnState} from "../Tetris/Figures";
 
 export interface FigurePlacingStep {
@@ -47,5 +47,12 @@ export class FigurePlacingResult {
     constructor(
         public figuresTargetStates: Map<FallingFigure, FallingFigure>,
         public placingSteps: FigurePlacingStep[],
+    ) {}
+}
+
+export class Hole {
+    constructor(
+        public isOpened: boolean,
+        public cells: Coordinate[],
     ) {}
 }

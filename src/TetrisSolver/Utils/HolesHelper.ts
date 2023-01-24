@@ -1,16 +1,11 @@
-import {Coordinate, GameData} from "../Tetris/Common";
-import {FigurePlacingChecker} from "../Tetris/Utils/FigurePlacingChecker";
-
-export class Hole {
-    constructor(
-        public isOpened: boolean,
-        public cells: Coordinate[],
-    ) {}
-}
+import {Hole} from "../Common";
+import {Coordinate} from "../../Tetris/Common";
+import {FigurePlacingChecker} from "../../Tetris/Utils/FigurePlacingChecker";
 
 export class HolesHelper {
-    public collectHoles(matrix: boolean[][]): Hole[] {
+    public static collectHoles(matrix: boolean[][]): Hole[] {
         let holes: Hole[] = [];
+
         class HoleInProcess {
             constructor(
                 public cells: Coordinate[] = [],
@@ -18,8 +13,10 @@ export class HolesHelper {
                 public currentRowOpenXs: number[] = [],
                 public isOpened: boolean = false,
                 public continues: boolean = false,
-            ) {}
+            ) {
+            }
         }
+
         let holesInProcess: HoleInProcess[] = [];
         let coveredColumns: Set<number> = new Set();
         matrix.forEach((row, y) => {
@@ -41,7 +38,7 @@ export class HolesHelper {
                     processingHole.cells.push(new Coordinate(x, y));
                     processingHole.continues = true;
                     processingHole.isOpened = processingHole.isOpened
-                        || this.doesTheWayOutFromHoleExists(matrix, new Coordinate(x, y), coveredColumns);
+                        || this.doesTheWayOutFromHoleExists(matrix, new Coordinate(x, y), coveredColumns, [[true, true]]);
                 }
             });
             let holesInProgressToRemove: number[] = [];
@@ -63,12 +60,16 @@ export class HolesHelper {
         return holes;
     }
 
-    public doesTheWayOutFromHoleExists(matrix: boolean[][], initialCoordinate: Coordinate, coveredColumns: Set<number>, figureMatrix: boolean[][] = [[true]]) {
+    public static doesTheWayOutFromHoleExists(matrix: boolean[][], initialCoordinate: Coordinate, coveredColumns: Set<number>, figureMatrix: boolean[][]) {
         return this.findTheWayOutFromHole(matrix, initialCoordinate, coveredColumns, figureMatrix) !== undefined;
     }
 
-    public findTheWayOutFromHole(matrix: boolean[][], initialCoordinate: Coordinate, coveredColumns: Set<number>, figureMatrix: boolean[][] = [[true]]): number|undefined {
+    public static findTheWayOutFromHole(matrix: boolean[][], initialCoordinate: Coordinate, coveredColumns: Set<number>|Map<number, number>, figureMatrix: boolean[][]): number | undefined {
+        if (coveredColumns instanceof Map) {
+            coveredColumns = HolesHelper.convertCoveredColumnsToXs(coveredColumns);
+        }
         // trying to find the way out from the left side
+        let targetXCandidate: number | undefined;
         for (let x = initialCoordinate.x - 1; x >= 0; x--) {
             if (!FigurePlacingChecker.canFigureBePlaced(figureMatrix, new Coordinate(x, initialCoordinate.y), matrix)) {
                 break;
@@ -105,12 +106,25 @@ export class HolesHelper {
         return undefined;
     }
 
-    public collectCoveredColumns(matrix: boolean[][], toY?: number): Set<number> {
-        let coveredColumns: Set<number> = new Set();
+    public static collectCoveredColumnsXs(matrix: boolean[][], toY?: number): Set<number> {
+        return HolesHelper.convertCoveredColumnsToXs(
+            HolesHelper.collectCoveredColumns(matrix, toY),
+        );
+    }
+
+    public static convertCoveredColumnsToXs(coveredColumns: Map<number, number>): Set<number> {
+        return new Set([...coveredColumns.keys()]);
+    }
+
+    /**
+     * Возвращает мапу x: y
+     */
+    public static collectCoveredColumns(matrix: boolean[][], toY?: number): Map<number, number> {
+        let coveredColumns: Map<number, number> = new Map();
         matrix.some((row, y) => {
             row.forEach((val, x) => {
                 if (val) {
-                    coveredColumns.add(x);
+                    coveredColumns.set(x, y);
                 }
             });
             return (toY !== undefined && y >= toY)
