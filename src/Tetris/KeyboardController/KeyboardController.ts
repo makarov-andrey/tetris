@@ -1,7 +1,7 @@
 import {CommandBus, CommandType, DropFiguresCommand, InitGameCommand, MoveLeftCommand, MoveRightCommand, TurnClockwiseCommand, MoveDownCommand} from "../CommandBus/CommandBus";
 import {GameData} from "../Common";
 
-export class MovingController {
+export class KeyboardController {
     constructor(
         private commandBus: CommandBus
     ) {

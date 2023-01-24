@@ -5,7 +5,6 @@ import {AlwaysOneFigureSpawner} from "./FiguresSpawner/AlwaysOneFigureSpawner";
 import {EventBus} from "./EventBus/EventBus";
 import {CommandBus, InitGameCommand, PauseGameCommand, ResumeGameCommand} from "./CommandBus/CommandBus";
 import {MovingHandler} from "./MovingHandler/MovingHandler";
-import {MovingController} from "./MovingController/MovingController";
 import {LevelBasedTimingsHandler} from "./TimingsHandler/LevelBasedTimingsHandler";
 import {FallTickScoreCounter} from "./ScoreCounter/FallTickScoreCounter";
 import {SquashedRowsCounterBasedLevelCounter} from "./LevelCounter/SquashedRowsCounterBasedLevelCounter";
@@ -13,6 +12,7 @@ import {GameData} from "./Common";
 import {ComboCounter} from "./ComboCounter/ComboCounter";
 import {ConstTimingsHandler} from "./TimingsHandler/ConstTimingsHandler";
 import {StatsCounter} from "./StatsCounter/StatsCounter";
+import {KeyboardController} from "./KeyboardController/KeyboardController";
 
 export class TetrisFacade {
     public constructor(
@@ -28,7 +28,7 @@ export class TetrisFacade {
             commandBus,
             eventBus,
         ),
-        private movingController = new MovingController(
+        private keyboardController = new KeyboardController(
             commandBus,
         ),
         private fallingFiguresProcessor = new RegularFallingFiguresProcessor(

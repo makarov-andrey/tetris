@@ -1,4 +1,5 @@
 import {GameData} from "../Common";
+import {FigureTurnState} from "../Figures";
 
 export enum CommandType {
     InitGame,
@@ -12,6 +13,9 @@ export enum CommandType {
     TurnClockwise,
     MoveDown,
     FiguresFallDown,
+    MoveToX,
+    MoveToY,
+    TurnToState,
 }
 
 export interface Command {
@@ -117,6 +121,39 @@ export class MoveDownCommand implements Command {
 
     public getCommandType(): CommandType {
         return CommandType.MoveDown;
+    }
+}
+
+export class MoveToXCommand implements Command {
+    constructor(
+        public gameData: GameData,
+        public x: number
+    ) {}
+
+    public getCommandType(): CommandType {
+        return CommandType.MoveToX;
+    }
+}
+
+export class MoveToYCommand implements Command {
+    constructor(
+        public gameData: GameData,
+        public y: number,
+    ) {}
+
+    public getCommandType(): CommandType {
+        return CommandType.MoveToY;
+    }
+}
+
+export class TurnToStateCommand implements Command {
+    constructor(
+        public gameData: GameData,
+        public turnState: FigureTurnState
+    ) {}
+
+    public getCommandType(): CommandType {
+        return CommandType.TurnToState;
     }
 }
 

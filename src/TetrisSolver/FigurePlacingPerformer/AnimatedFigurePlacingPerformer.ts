@@ -1,12 +1,9 @@
-import {FallingFigure, GameData} from "../Tetris/Common";
-import {CommandBus, DropFiguresCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand, TurnClockwiseCommand} from "../Tetris/CommandBus/CommandBus";
-import {LevelBasedTimingsHandler} from "../Tetris/TimingsHandler/LevelBasedTimingsHandler";
-import {DropPlacingStep, FigurePlacingResult, FigurePlacingStep, MoveXPlacingStep, MoveYPlacingStep, TurnPlacingStep} from "./Common";
-
-class PlacingError extends Error {}
-class GameStateNotSupportedError extends PlacingError {}
-class InconsistentTargetStateError extends PlacingError {}
-class NotSupportedDirectionStepError extends PlacingError {}
+import {FallingFigure, GameData} from "../../Tetris/Common";
+import {CommandBus, DropFiguresCommand, MoveDownCommand, MoveLeftCommand, MoveRightCommand, TurnClockwiseCommand} from "../../Tetris/CommandBus/CommandBus";
+import {LevelBasedTimingsHandler} from "../../Tetris/TimingsHandler/LevelBasedTimingsHandler";
+import {DropPlacingStep, FigurePlacingResult, FigurePlacingStep, MoveXPlacingStep, MoveYPlacingStep, TurnPlacingStep} from "../Common";
+import {FigurePlacingPerformerInterface, GameStateNotSupportedError, InconsistentTargetStateError, NotSupportedDirectionStepError} from "./FigurePlacingPerformerInterface";
+import {TimingsHandler} from "../../Tetris/TimingsHandler/TimingsHandler";
 
 class StepDecorator {
     public isPerformed: boolean = false;
@@ -32,14 +29,14 @@ class TargetState {
     }
 }
 
-export class FigurePlacingPerformer {
+export class AnimatedFigurePlacingPerformer implements FigurePlacingPerformerInterface {
     private nextMoveTimeoutId: ReturnType<typeof setTimeout> = setTimeout(() => {});
     private targetState?: TargetState;
     private gameData: GameData = GameData.makeSimple();
 
     constructor(
         private commandBus: CommandBus,
-        private timingsHandler = new LevelBasedTimingsHandler(100, 0.9),
+        private timingsHandler: TimingsHandler,
     ) {}
 
     public place(gameData: GameData, placingResult?: FigurePlacingResult) {
@@ -110,11 +107,8 @@ export class FigurePlacingPerformer {
         });
 
         if (!allStepsPassed) {
-            // this.processTick();
             this.nextMoveTimeoutId = setTimeout(
                 this.processTick.bind(this),
-                10,
-                // this.timingsHandler.getDelayForNextTickMs(this.gameData),
             );
         }
     }

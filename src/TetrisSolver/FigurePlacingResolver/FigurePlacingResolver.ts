@@ -1,12 +1,12 @@
-import {Coordinate, FallingFigure, GameData} from "../Tetris/Common";
-import {EnumHelper} from "../Tetris/Utils/EnumHelper";
-import {FigureTurnState} from "../Tetris/Figures";
-import {FigurePlacingChecker} from "../Tetris/Utils/FigurePlacingChecker";
-import {CommandBus, RenderCommand} from "../Tetris/CommandBus/CommandBus";
-import {DropPlacingStep, FigurePlacingResult, FigurePlacingStep, MoveXPlacingStep, MoveYPlacingStep, TurnPlacingStep} from "./Common";
-import {CalculatorAggregate} from "./ScoreCalculator/CalculatorAggregate";
-import {HolesHelper} from "./Utils/HolesHelper";
-import {CalculateScoreRequest} from "./ScoreCalculator/ScoreCalculatorInterface";
+import {Coordinate, FallingFigure, GameData} from "../../Tetris/Common";
+import {EnumHelper} from "../../Tetris/Utils/EnumHelper";
+import {FigureTurnState} from "../../Tetris/Figures";
+import {FigurePlacingChecker} from "../../Tetris/Utils/FigurePlacingChecker";
+import {CommandBus, RenderCommand} from "../../Tetris/CommandBus/CommandBus";
+import {DropPlacingStep, FigurePlacingResult, FigurePlacingStep, MoveXPlacingStep, MoveYPlacingStep, TurnPlacingStep} from "../Common";
+import {CalculatorAggregate} from "../ScoreCalculator/CalculatorAggregate";
+import {HolesHelper} from "../Utils/HolesHelper";
+import {CalculateScoreRequest} from "../ScoreCalculator/ScoreCalculatorInterface";
 
 class PlaceResolvingError extends Error {
 }

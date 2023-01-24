@@ -1,4 +1,15 @@
-import {CommandBus, CommandType, MoveLeftCommand, MoveRightCommand, TurnClockwiseCommand, MoveDownCommand, FiguresFallTickCommand} from "../CommandBus/CommandBus";
+import {
+    CommandBus,
+    CommandType,
+    MoveLeftCommand,
+    MoveRightCommand,
+    TurnClockwiseCommand,
+    MoveDownCommand,
+    FiguresFallTickCommand,
+    MoveToXCommand,
+    MoveToYCommand,
+    TurnToStateCommand
+} from "../CommandBus/CommandBus";
 import {FigureTurnState} from "../Figures";
 import {EventBus, FiguresMovedEvent} from "../EventBus/EventBus";
 import {Coordinate, FallingFigure} from "../Common";
@@ -14,6 +25,9 @@ export class MovingHandler {
         this.commandBus.addHandler(CommandType.MoveRight, this.processMoveRightCommand.bind(this));
         this.commandBus.addHandler(CommandType.MoveDown, this.processMoveDownCommand.bind(this));
         this.commandBus.addHandler(CommandType.TurnClockwise, this.processTurnClockwiseCommand.bind(this));
+        this.commandBus.addHandler(CommandType.MoveToX, this.processMoveToXCommand.bind(this));
+        this.commandBus.addHandler(CommandType.MoveToY, this.processMoveToYCommand.bind(this));
+        this.commandBus.addHandler(CommandType.TurnToState, this.processTurnToStateCommand.bind(this));
     }
 
     private processMoveLeftCommand(command: MoveLeftCommand): void {
@@ -65,5 +79,52 @@ export class MovingHandler {
 
     private processMoveDownCommand(command: MoveDownCommand): void {
         this.commandBus.run(new FiguresFallTickCommand(command.gameData));
+    }
+
+    private processMoveToXCommand(command: MoveToXCommand): void {
+        if (command.x < 0 || command.x > (command.gameData.settings.fieldWidth - 1)) {
+            return;
+        }
+        command.gameData.fallingFigures.forEach(figure => {
+            const movingModifier = command.x > figure.position.x ? 1 : -1;
+            while (figure.position.x !== command.x && FigurePlacingChecker.canFigureBePlaced(
+                figure.figure.getTurn(figure.turnState),
+                new Coordinate(figure.position.x + movingModifier, figure.position.y),
+                command.gameData.matrix
+            )) {
+                figure.position.x += movingModifier;
+            }
+        });
+        this.eventBus.fire(new FiguresMovedEvent(command.gameData));
+    }
+
+    private processMoveToYCommand(command: MoveToYCommand): void {
+        if (command.y < 0) {
+            return;
+        }
+        command.gameData.fallingFigures.forEach(figure => {
+            while (figure.position.y < command.y && FigurePlacingChecker.canFigureBePlaced(
+                figure.figure.getTurn(figure.turnState),
+                new Coordinate(figure.position.x, figure.position.y + 1),
+                command.gameData.matrix
+            )) {
+                figure.position.y++;
+            }
+        });
+        this.eventBus.fire(new FiguresMovedEvent(command.gameData));
+    }
+
+    private processTurnToStateCommand(command: TurnToStateCommand): void {
+        command.gameData.fallingFigures.forEach(figure => {
+            const canBeTurned = FigurePlacingChecker.canFigureBePlaced(
+                figure.figure.getTurn(command.turnState),
+                figure.position,
+                command.gameData.matrix
+            );
+            if (canBeTurned) {
+                figure.turnState = command.turnState;
+            }
+        });
+        this.eventBus.fire(new FiguresMovedEvent(command.gameData));
     }
 }
