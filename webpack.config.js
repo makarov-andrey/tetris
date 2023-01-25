@@ -1,7 +1,11 @@
 const path = require('path');
 
 module.exports = {
-    entry: './src/index.ts',
+    entry: {
+        index: './src/index.ts',
+        bench: './src/bench.ts',
+        tetris_solving_worker: './src/tetris_solving_worker.ts',
+    },
     devtool: 'inline-source-map',
     module: {
         rules: [
@@ -15,8 +19,11 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
+    experiments: {
+        topLevelAwait: true
+    },
     output: {
-        filename: 'bundle.js',
+        filename: '[name].js',
         path: path.resolve(__dirname, 'dist'),
     },
 };

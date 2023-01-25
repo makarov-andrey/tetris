@@ -52,7 +52,8 @@ export class GameController {
 
     private onFallTickProcessed(event: FallTickProcessedEvent): void {
         clearTimeout(this.gameData.nextTickTimeoutId);
-        if (!this.gameData.isGameOver) {
+        const delay = this.timingsHandler.getDelayForNextTickMs(this.gameData);
+        if (!this.gameData.isGameOver && delay != Infinity) {
             this.gameData.nextTickTimeoutId = setTimeout(
                 this.fallTick.bind(this),
                 this.timingsHandler.getDelayForNextTickMs(this.gameData)

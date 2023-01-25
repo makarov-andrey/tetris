@@ -43,7 +43,7 @@ export class FigurePlacingResolver {
         })
 
         // let debugMode = true;
-        let debugMode = 'debugMode' in window && window.debugMode;
+        /*let debugMode = 'debugMode' in window && window.debugMode;
         let imaginableFigure = theBestResult.figuresTargetStates.get(originalFigure);
         if (debugMode && imaginableFigure !== undefined) {
             let fakeGameData = structuredClone(gameData);
@@ -56,7 +56,7 @@ export class FigurePlacingResolver {
                 fakeGameData.fallingFigures = [imaginableFigure];
                 this.commandBus.run(new RenderCommand(fakeGameData));
             })
-        }
+        }*/
 
         return theBestResult;
     }

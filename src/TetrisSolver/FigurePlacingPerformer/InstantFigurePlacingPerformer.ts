@@ -19,7 +19,11 @@ export class InstantFigurePlacingPerformer implements FigurePlacingPerformerInte
     ) {}
 
     public place(gameData: GameData, placingResult?: FigurePlacingResult) {
-        setTimeout(() => this.placeImpl(gameData, placingResult), 0);
+        if (typeof setImmediate !== 'undefined') {
+            setImmediate(() => this.placeImpl(gameData, placingResult));
+        } else {
+            setTimeout(() => this.placeImpl(gameData, placingResult), 0);
+        }
     }
 
     private placeImpl(gameData: GameData, placingResult?: FigurePlacingResult) {
