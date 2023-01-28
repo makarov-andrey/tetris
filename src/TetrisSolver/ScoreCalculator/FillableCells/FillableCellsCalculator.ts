@@ -1,15 +1,31 @@
 import {CalculateScoreRequest, ScoreCalculatorInterface} from "../ScoreCalculatorInterface";
-import {GameData} from "../../../Tetris/Common";
-import {Hole} from "../../Common";
+
+export class FillableCellsCalculatorParams {
+    constructor(
+        public minimumValuableHeight: number,
+        public powMultiplier: number,
+        public multiplier: number,
+    ) {}
+}
 
 export class FillableCellsCalculator implements ScoreCalculatorInterface {
-    calculateScore(request: CalculateScoreRequest): number {
+    constructor(
+        private readonly params = new FillableCellsCalculatorParams(5, 1, 1),
+    ) {}
+
+    public calculateScore(request: CalculateScoreRequest): number {
         const fieldHeight = request.gameData.settings.fieldHeight;
         const fieldWidth = request.gameData.settings.fieldWidth;
         const [fillableCellsCount, fillableHeight] = this.calculateFillableSpace(request.imaginableMatrix, fieldWidth);
         let fillableCellsScore = 0;
-        if (fillableHeight > 5) {
-            fillableCellsScore = -fillableCellsCount * Math.pow(fillableCellsCount, fillableCellsCount / (fieldHeight * fieldWidth));
+        if (fillableHeight > this.params.minimumValuableHeight) {
+            fillableCellsScore = -fillableCellsCount
+                * Math.pow(
+                    fillableCellsCount,
+                    fillableCellsCount / (fieldHeight * fieldWidth)
+                        * this.params.powMultiplier
+                )
+                * this.params.multiplier;
         }
         return fillableCellsScore;
     }

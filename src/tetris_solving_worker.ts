@@ -1,13 +1,12 @@
 import {BenchSolverFacade} from "./TetrisSolvingBench/BenchSolverFacade";
 import {EventBus, EventType, FallTickProcessedEvent, GameOverEvent} from "./Tetris/EventBus/EventBus";
-import {CommandBus} from "./Tetris/CommandBus/CommandBus";
+import {BenchRunParameters} from "./TetrisSolvingBench/Common";
 
 const workerpool = require('workerpool');
 
-async function solveTetris() {
+async function solveTetris(params: BenchRunParameters) {
     const eventBus = new EventBus();
-    const commandBus = new CommandBus();
-    let bench = new BenchSolverFacade(eventBus, commandBus);
+    let bench = new BenchSolverFacade(params, eventBus);
     bench.start();
     return await new Promise(resolve => {
         eventBus.on(EventType.FallingTickProcessed, (event: FallTickProcessedEvent) => {

@@ -19,9 +19,11 @@ import {SquashedRowsCalculator} from "../TetrisSolver/ScoreCalculator/SquashedRo
 import {TunnelsCalculator} from "../TetrisSolver/ScoreCalculator/Tunnels/TunnelsCalculator";
 import {InstantFigurePlacingPerformer} from "../TetrisSolver/FigurePlacingPerformer/InstantFigurePlacingPerformer";
 import {RegularFallingFiguresProcessor} from "../Tetris/FallingFiguresProcessor/RegularFallingFiguresProcessor";
+import {BenchRunParameters} from "./Common";
 
 export class BenchSolverFacade {
     public constructor(
+        private benchRunParameters: BenchRunParameters,
         private eventBus = new EventBus(),
         private commandBus = new CommandBus(),
         private gameController = new GameController(
@@ -66,11 +68,11 @@ export class BenchSolverFacade {
             new FigurePlacingResolver(
                 commandBus,
                 new CalculatorAggregate([
-                    new FillableCellsCalculator(),
-                    new FilledHeightCalculator(),
-                    new HolesV1Calculator(),
-                    new SquashedRowsCalculator(),
-                    new TunnelsCalculator(),
+                    new FillableCellsCalculator(benchRunParameters.fillableCellsCalculatorParams),
+                    new FilledHeightCalculator(benchRunParameters.filledHeightCalculatorParams),
+                    new HolesV1Calculator(benchRunParameters.holesV1CalculatorParams),
+                    new SquashedRowsCalculator(benchRunParameters.squashedRowsCalculatorParams),
+                    new TunnelsCalculator(benchRunParameters.tunnelsCalculatorParams),
                 ]),
             ),
             new InstantFigurePlacingPerformer(commandBus),
