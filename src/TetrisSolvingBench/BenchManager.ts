@@ -1,5 +1,4 @@
 import {WorkerPool} from "workerpool";
-import {GameData} from "../Tetris/Common";
 import {BenchRunParameters} from "./Common";
 import {BenchParamsGenerator} from "./BenchParamsGenerator";
 
@@ -11,7 +10,7 @@ class RunResult {
 }
 
 export class BenchManager {
-    private readonly iterations = 1000;
+    private readonly iterations = 10;
     private readonly valuablePercentiles = [0, 50, 95, 99, 99.9];
     private resolveWorkersPoolFreed: (value: unknown) => void = () => {};
 
@@ -23,16 +22,11 @@ export class BenchManager {
     public async startBench() {
         console.log(this.benchParamsGenerator.count());
         for (let params of this.benchParamsGenerator.generate()) {
-            // console.log('new value yielded', params);
             this.run(params).then(result => {
-                // todo save the result to file instead
                 console.log(`[${this.paramsToLogData(params).join(',')}]; {[${result.percentiles.join(',')}], ${result.average}}`);
             });
-            // todo render cli progress bar
             await this.promiseWorkersPoolToFree();
         }
-        // console.log('last pack of workers have been run');
-        // console.log(this.pool.stats());
     }
 
     private async run(params: BenchRunParameters): Promise<RunResult> {
@@ -40,9 +34,9 @@ export class BenchManager {
         for (let i = 0; i < this.iterations; i++) {
             promises.push(new Promise(resolve => {
                 this.pool.exec('solveTetris', [params])
-                    .then((result: GameData) => {
+                    .then((figuresFallen: number) => {
                         this.checkWorkersPoolIfFree();
-                        resolve(result.stats.figuresFallen);
+                        resolve(figuresFallen);
                     });
             }));
         }

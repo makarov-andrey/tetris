@@ -4,7 +4,7 @@ import {BenchRunParameters} from "./TetrisSolvingBench/Common";
 
 const workerpool = require('workerpool');
 
-async function solveTetris(params: BenchRunParameters) {
+async function solveTetris(params: BenchRunParameters): Promise<number> {
     const eventBus = new EventBus();
     let bench = new BenchSolverFacade(params, eventBus);
     bench.start();
@@ -12,11 +12,11 @@ async function solveTetris(params: BenchRunParameters) {
         eventBus.on(EventType.FallingTickProcessed, (event: FallTickProcessedEvent) => {
             if (event.gameData.stats.figuresFallen >= 1_000_000) {
                 bench.pause();
-                resolve(event.gameData);
+                resolve(event.gameData.stats.figuresFallen);
             }
         });
         eventBus.on(EventType.GameOver, (event: GameOverEvent) => {
-            resolve(event.gameData);
+            resolve(event.gameData.stats.figuresFallen);
         });
     });
 }
