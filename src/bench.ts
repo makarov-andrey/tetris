@@ -5,7 +5,7 @@ import * as path from 'path';
 
 const workerPool = pool(
     path.resolve('./dist/tetris_solving_worker.js'),
-    {maxWorkers: 10}
+    {maxWorkers: 120}
 );
 
 const benchManager = new BenchManager(

@@ -6,40 +6,40 @@ import {SquashedRowsCalculatorParams} from "../TetrisSolver/ScoreCalculator/Squa
 import {TunnelsCalculatorParams} from "../TetrisSolver/ScoreCalculator/Tunnels/TunnelsCalculator";
 
 export class BenchParamsGenerator {
-    private readonly fillableCellsMinimumValuableHeight = [3,5,7];
-    private readonly fillableCellsPowMultiplier = [0];
-    private readonly fillableCellsMultiplier = [1,2,3];
+    private readonly fillableCellsMinimumValuableHeight = [5, 3, 7];
+    private readonly fillableCellsPowMultiplier = [0, 1];
+    private readonly fillableCellsMultiplier = [2, 1, 3];
 
-    private readonly filledHeightPowMultiplier = [0];
-    private readonly filledHeightMultiplier = [1,3,5];
+    private readonly filledHeightPowMultiplier = [0, 1];
+    private readonly filledHeightMultiplier = [3, 1, 5];
 
-    private readonly holesV1CountDecreaseMultiplier = [130,150,170];
-    private readonly holesV1CountIncreaseMultiplier = [60,70,80];
-    private readonly holesV1CoveredHeightPowMultiplier = [0];
-    private readonly holesV1CoveredHeightMultiplier = [3,5,7];
+    private readonly holesV1CountDecreaseMultiplier = [150, 130, 170];
+    private readonly holesV1CountIncreaseMultiplier = [70, 60, 80];
+    private readonly holesV1CoveredHeightPowMultiplier = [0, 1];
+    private readonly holesV1CoveredHeightMultiplier = [5, 3, 7];
 
-    private readonly squashedRowsMultiplier = [5,10,15];
+    private readonly squashedRowsMultiplier = [10, 5, 15];
 
-    private readonly tunnelsMinimumValuableHeight = [2,3,4];
-    private readonly tunnelsCountMultiplier = [40,70,90];
-    private readonly tunnelsHeightPowMultiplier = [0];
-    private readonly tunnelsHeightMultiplier = [5,7,10];
+    private readonly tunnelsMinimumValuableHeight = [3, 2, 4];
+    private readonly tunnelsCountMultiplier = [70, 40, 90];
+    private readonly tunnelsHeightPowMultiplier = [1, 0];
+    private readonly tunnelsHeightMultiplier = [7, 5, 10];
 
-    public *generate(): Generator<BenchRunParameters> {
-        for (let fillableCellsMinimumValuableHeight of this.fillableCellsMinimumValuableHeight) {
-            for (let fillableCellsPowMultiplier of this.fillableCellsPowMultiplier) {
-                for (let fillableCellsMultiplier of this.fillableCellsMultiplier) {
-                    for (let filledHeightPowMultipliers of this.filledHeightPowMultiplier) {
-                        for (let filledHeightMultipliers of this.filledHeightMultiplier) {
-                            for (let holesV1CountDecreaseMultiplier of this.holesV1CountDecreaseMultiplier) {
-                                for (let holesV1CountIncreaseMultiplier of this.holesV1CountIncreaseMultiplier) {
-                                    for (let holesV1CoveredHeightPowMultiplier of this.holesV1CoveredHeightPowMultiplier) {
-                                        for (let holesV1CoveredHeightMultiplier of this.holesV1CoveredHeightMultiplier) {
-                                            for (let squashedRowsMultiplier of this.squashedRowsMultiplier) {
-                                                for (let tunnelsMinimumValuableHeight of this.tunnelsMinimumValuableHeight) {
-                                                    for (let tunnelsCountMultiplier of this.tunnelsCountMultiplier) {
-                                                        for (let tunnelsHeightPowMultiplier of this.tunnelsHeightPowMultiplier) {
-                                                            for (let tunnelsHeightMultiplier of this.tunnelsHeightMultiplier) {
+    public* generate(): Generator<BenchRunParameters> {
+        for (let squashedRowsMultiplier of this.squashedRowsMultiplier) {
+            for (let tunnelsHeightPowMultiplier of this.tunnelsHeightPowMultiplier) {
+                for (let holesV1CoveredHeightPowMultiplier of this.holesV1CoveredHeightPowMultiplier) {
+                    for (let fillableCellsPowMultiplier of this.fillableCellsPowMultiplier) {
+                        for (let filledHeightPowMultipliers of this.filledHeightPowMultiplier) {
+                            for (let tunnelsMinimumValuableHeight of this.tunnelsMinimumValuableHeight) {
+                                for (let tunnelsCountMultiplier of this.tunnelsCountMultiplier) {
+                                    for (let tunnelsHeightMultiplier of this.tunnelsHeightMultiplier) {
+                                        for (let filledHeightMultipliers of this.filledHeightMultiplier) {
+                                            for (let holesV1CoveredHeightMultiplier of this.holesV1CoveredHeightMultiplier) {
+                                                for (let holesV1CountDecreaseMultiplier of this.holesV1CountDecreaseMultiplier) {
+                                                    for (let holesV1CountIncreaseMultiplier of this.holesV1CountIncreaseMultiplier) {
+                                                        for (let fillableCellsMinimumValuableHeight of this.fillableCellsMinimumValuableHeight) {
+                                                            for (let fillableCellsMultiplier of this.fillableCellsMultiplier) {
                                                                 yield new BenchRunParameters(
                                                                     new FillableCellsCalculatorParams(
                                                                         fillableCellsMinimumValuableHeight,

@@ -10,7 +10,7 @@ class RunResult {
 }
 
 export class BenchManager {
-    private readonly iterations = 10;
+    private readonly iterations = 1000;
     private readonly valuablePercentiles = [0, 50, 95, 99, 99.9];
     private resolveWorkersPoolFreed: (value: unknown) => void = () => {};
 
