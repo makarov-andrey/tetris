@@ -5,6 +5,12 @@ import * as path from 'path';
 import minimist from 'minimist';
 import {PersistedGenerator} from "./TetrisSolvingBench/BenchParamsGenerator/PersistedGenerator";
 
+process.on('SIGINT', () => { process.exit(); });
+process.on('SIGTERM', () => { process.exit(); });
+process.on('uncaughtException', () => { process.exit(); });
+
+process.stdin.resume();
+
 const argv = minimist(process.argv.slice(2));
 
 const threads = Number.parseInt(argv.t || argv.threads || '10');

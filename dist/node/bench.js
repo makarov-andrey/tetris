@@ -32,6 +32,10 @@ const StaticGenerator_1 = require("./TetrisSolvingBench/BenchParamsGenerator/Sta
 const path = __importStar(require("path"));
 const minimist_1 = __importDefault(require("minimist"));
 const PersistedGenerator_1 = require("./TetrisSolvingBench/BenchParamsGenerator/PersistedGenerator");
+process.on('SIGINT', () => { process.exit(); });
+process.on('SIGTERM', () => { process.exit(); });
+process.on('uncaughtException', () => { process.exit(); });
+process.stdin.resume();
 const argv = (0, minimist_1.default)(process.argv.slice(2));
 const threads = Number.parseInt(argv.t || argv.threads || '10');
 const iterations = Number.parseInt(argv.i || argv.iterations || '1000');
