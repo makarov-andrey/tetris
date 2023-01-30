@@ -26,16 +26,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
 const workerpool_1 = require("workerpool");
 const BenchManager_1 = require("./TetrisSolvingBench/BenchManager");
 const StaticGenerator_1 = require("./TetrisSolvingBench/BenchParamsGenerator/StaticGenerator");
 const path = __importStar(require("path"));
 const minimist_1 = __importDefault(require("minimist"));
 const PersistedGenerator_1 = require("./TetrisSolvingBench/BenchParamsGenerator/PersistedGenerator");
-process.on('SIGINT', () => { process.exit(); });
-process.on('SIGTERM', () => { process.exit(); });
-process.on('uncaughtException', () => { process.exit(); });
-process.stdin.resume();
 const argv = (0, minimist_1.default)(process.argv.slice(2));
 const threads = Number.parseInt(argv.t || argv.threads || '10');
 const iterations = Number.parseInt(argv.i || argv.iterations || '1000');
@@ -47,4 +44,10 @@ const benchManager = new BenchManager_1.BenchManager(workerPool, new PersistedGe
 benchManager.calculateBenchmarks().then(() => {
     console.log('Successfully finished');
 });
+const app = (0, express_1.default)();
+const port = 3000;
+app.get('/ping', (req, res) => {
+    res.send('pong');
+});
+app.listen(3000);
 //# sourceMappingURL=bench.js.map
