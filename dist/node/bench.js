@@ -32,6 +32,24 @@ const StaticGenerator_1 = require("./TetrisSolvingBench/BenchParamsGenerator/Sta
 const path = __importStar(require("path"));
 const minimist_1 = __importDefault(require("minimist"));
 const PersistedGenerator_1 = require("./TetrisSolvingBench/BenchParamsGenerator/PersistedGenerator");
+let running = true;
+function killProcess() {
+    console.log('Killed');
+    running = false;
+}
+function keepRunning() {
+    setTimeout(() => {
+        if (running) {
+            keepRunning();
+        }
+    }, 1000);
+}
+process.on('SIGTERM', killProcess);
+process.on('SIGINT', killProcess);
+process.on('uncaughtException', function (e) {
+    console.log('[uncaughtException] app will be terminated: ', e.stack);
+    killProcess();
+});
 const argv = (0, minimist_1.default)(process.argv.slice(2));
 const threads = Number.parseInt(argv.t || argv.threads || '10');
 const iterations = Number.parseInt(argv.i || argv.iterations || '1000');
@@ -42,5 +60,7 @@ const workerPool = (0, workerpool_1.pool)(workerPath, { maxWorkers: threads });
 const benchManager = new BenchManager_1.BenchManager(workerPool, new PersistedGenerator_1.PersistedGenerator(new StaticGenerator_1.StaticGenerator(), resultFilePath), resultFilePath, iterations, percentiles);
 benchManager.calculateBenchmarks().then(() => {
     console.log('Successfully finished');
+    killProcess();
 });
+keepRunning();
 //# sourceMappingURL=bench.js.map

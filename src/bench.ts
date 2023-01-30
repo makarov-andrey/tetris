@@ -5,6 +5,25 @@ import * as path from 'path';
 import minimist from 'minimist';
 import {PersistedGenerator} from "./TetrisSolvingBench/BenchParamsGenerator/PersistedGenerator";
 
+let running = true;
+function killProcess() {
+    console.log('Killed');
+    running = false;
+}
+function keepRunning() {
+    setTimeout(() => {
+        if (running) {
+            keepRunning();
+        }
+    }, 1000);
+}
+process.on('SIGTERM', killProcess);
+process.on('SIGINT', killProcess);
+process.on('uncaughtException', function(e) {
+    console.log('[uncaughtException] app will be terminated: ', e.stack);
+    killProcess();
+});
+
 const argv = minimist(process.argv.slice(2));
 
 const threads = Number.parseInt(argv.t || argv.threads || '10');
@@ -28,4 +47,7 @@ const benchManager = new BenchManager(
 
 benchManager.calculateBenchmarks().then(() => {
     console.log('Successfully finished');
+    killProcess();
 });
+
+keepRunning();
