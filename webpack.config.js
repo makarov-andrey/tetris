@@ -3,8 +3,6 @@ const path = require('path');
 module.exports = {
     entry: {
         index: './src/index.ts',
-        bench: './src/bench.ts',
-        tetris_solving_worker: './src/tetris_solving_worker.ts',
     },
     devtool: 'inline-source-map',
     module: {
@@ -25,6 +23,6 @@ module.exports = {
     output: {
         publicPath: '',
         filename: '[name].js',
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'dist/web'),
     },
 };

@@ -1,11 +1,12 @@
-import {BenchRunParameters} from "./Common";
-import {FillableCellsCalculatorParams} from "../TetrisSolver/ScoreCalculator/FillableCells/FillableCellsCalculator";
-import {FilledHeightCalculatorParams} from "../TetrisSolver/ScoreCalculator/FilledHeight/FilledHeightCalculator";
-import {HolesV1CalculatorParams} from "../TetrisSolver/ScoreCalculator/Holes/HolesV1Calculator";
-import {SquashedRowsCalculatorParams} from "../TetrisSolver/ScoreCalculator/SquashedRows/SquashedRowsCalculator";
-import {TunnelsCalculatorParams} from "../TetrisSolver/ScoreCalculator/Tunnels/TunnelsCalculator";
+import {BenchRunParameters} from "../Common";
+import {FillableCellsCalculatorParams} from "../../TetrisSolver/ScoreCalculator/FillableCells/FillableCellsCalculator";
+import {FilledHeightCalculatorParams} from "../../TetrisSolver/ScoreCalculator/FilledHeight/FilledHeightCalculator";
+import {HolesV1CalculatorParams} from "../../TetrisSolver/ScoreCalculator/Holes/HolesV1Calculator";
+import {SquashedRowsCalculatorParams} from "../../TetrisSolver/ScoreCalculator/SquashedRows/SquashedRowsCalculator";
+import {TunnelsCalculatorParams} from "../../TetrisSolver/ScoreCalculator/Tunnels/TunnelsCalculator";
+import {BenchParamsGeneratorInterface} from "./BenchParamsGeneratorInterface";
 
-export class BenchParamsGenerator {
+export class StaticGenerator implements BenchParamsGeneratorInterface {
     private readonly fillableCellsMinimumValuableHeight = [5, 3, 7];
     private readonly fillableCellsPowMultiplier = [0, 1];
     private readonly fillableCellsMultiplier = [2, 1, 3];
@@ -97,5 +98,9 @@ export class BenchParamsGenerator {
             * this.tunnelsCountMultiplier.length
             * this.tunnelsHeightPowMultiplier.length
             * this.tunnelsHeightMultiplier.length;
+    }
+
+    async init() {
+        return;
     }
 }

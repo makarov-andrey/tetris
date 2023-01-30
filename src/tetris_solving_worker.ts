@@ -1,14 +1,14 @@
+import workerpool from 'workerpool';
 import {BenchSolverFacade} from "./TetrisSolvingBench/BenchSolverFacade";
 import {EventBus, EventType, FallTickProcessedEvent, GameOverEvent} from "./Tetris/EventBus/EventBus";
-import {BenchRunParameters} from "./TetrisSolvingBench/Common";
+import {BenchRunParameters, BenchRunParametersTuple} from "./TetrisSolvingBench/Common";
 
-const workerpool = require('workerpool');
-
-async function solveTetris(params: BenchRunParameters): Promise<number> {
+function solveTetris(paramsTuple: BenchRunParametersTuple): Promise<number> {
+    const params = BenchRunParameters.fromTuple(paramsTuple);
     const eventBus = new EventBus();
     let bench = new BenchSolverFacade(params, eventBus);
     bench.start();
-    return await new Promise(resolve => {
+    return new Promise(resolve => {
         eventBus.on(EventType.FallingTickProcessed, (event: FallTickProcessedEvent) => {
             if (event.gameData.stats.figuresFallen >= 1_000_000) {
                 bench.pause();

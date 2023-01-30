@@ -3,9 +3,6 @@ import {CommandBus, InitGameCommand, PauseGameCommand, ResumeGameCommand} from "
 import {GameController} from "../Tetris/GameController";
 import {MovingHandler} from "../Tetris/MovingHandler/MovingHandler";
 import {AlwaysOneFigureSpawner} from "../Tetris/FiguresSpawner/AlwaysOneFigureSpawner";
-import {SquashedRowsCounterBasedLevelCounter} from "../Tetris/LevelCounter/SquashedRowsCounterBasedLevelCounter";
-import {ComboCounter} from "../Tetris/ComboCounter/ComboCounter";
-import {FallTickScoreCounter} from "../Tetris/ScoreCounter/FallTickScoreCounter";
 import {StatsCounter} from "../Tetris/StatsCounter/StatsCounter";
 import {GameData} from "../Tetris/Common";
 import {ConstTimingsHandler} from "../Tetris/TimingsHandler/ConstTimingsHandler";
@@ -42,20 +39,6 @@ export class BenchSolverFacade {
         private figuresSpawner = new AlwaysOneFigureSpawner(
             eventBus,
             commandBus,
-        ),
-        private levelCounter = new SquashedRowsCounterBasedLevelCounter(
-            eventBus,
-            commandBus,
-            8,
-            15,
-        ),
-        private comboCounter = new ComboCounter(
-            commandBus,
-            eventBus,
-        ),
-        private scoreCounter = new FallTickScoreCounter(
-            commandBus,
-            eventBus,
         ),
         private statsCounter = new StatsCounter(
             commandBus,

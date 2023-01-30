@@ -1,4 +1,7 @@
 {
+  "browser": {
+    "fs": false
+  },
   "devDependencies": {
     "@tsconfig/node18": "^1.0.1",
     "@types/minimist": "^1.2.2",

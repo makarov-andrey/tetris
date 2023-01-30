@@ -1,6 +1,7 @@
 import {WorkerPool, WorkerPoolStats} from "workerpool";
 import {BenchRunParameters} from "./Common";
-import {BenchParamsGenerator} from "./BenchParamsGenerator";
+import {BenchParamsGeneratorInterface} from "./BenchParamsGenerator/BenchParamsGeneratorInterface";
+import * as fs from 'fs';
 
 class RunResult {
     constructor(
@@ -15,15 +16,26 @@ export class BenchManager {
 
     constructor(
         private readonly pool: WorkerPool,
-        private readonly benchParamsGenerator: BenchParamsGenerator,
-        private readonly iterations = 1000,
-        private readonly percentiles = [0, 50, 95, 99, 99.9],
+        private readonly benchParamsGenerator: BenchParamsGeneratorInterface,
+        private readonly resultFilePath: string,
+        private readonly iterations: number,
+        private readonly percentiles: number[],
     ) {}
 
-    public async startBench() {
+    public async calculateBenchmarks() {
+        await this.benchParamsGenerator.init();
         for (let params of this.benchParamsGenerator.generate()) {
             this.run(params).then(result => {
-                console.log(`${new Date().toISOString()}; [${this.paramsToLogData(params).join(',')}]; {[${result.percentiles.join(',')}], ${result.average}}`);
+                const log = JSON.stringify({
+                    ts: new Date().toISOString(),
+                    par: params.toTuple(),
+                    res: {
+                        perc: result.percentiles,
+                        avg: result.average,
+                    },
+                });
+                console.log(log);
+                fs.appendFile(this.resultFilePath, log + '\n', () => {});
             });
             await this.promiseWorkersPoolToFree();
         }
@@ -34,7 +46,7 @@ export class BenchManager {
         let promises: Promise<number>[] = [];
         for (let i = 0; i < this.iterations; i++) {
             promises.push(new Promise(resolve => {
-                this.pool.exec('solveTetris', [params])
+                this.pool.exec('solveTetris', [params.toTuple()])
                     .then((figuresFallen: number) => {
                         const stats = this.pool.stats();
                         resolve(figuresFallen);
@@ -66,25 +78,6 @@ export class BenchManager {
         if (stats.pendingTasks < this.iterations) {
             this.resolveWorkersPoolFreed(true);
         }
-    }
-
-    private paramsToLogData(params: BenchRunParameters): Array<number> {
-        return [
-            params.fillableCellsCalculatorParams.minimumValuableHeight,
-            params.fillableCellsCalculatorParams.powMultiplier,
-            params.fillableCellsCalculatorParams.multiplier,
-            params.filledHeightCalculatorParams.powMultiplier,
-            params.filledHeightCalculatorParams.multiplier,
-            params.holesV1CalculatorParams.countDecreaseMultiplier,
-            params.holesV1CalculatorParams.countIncreaseMultiplier,
-            params.holesV1CalculatorParams.coveredHeightPowMultiplier,
-            params.holesV1CalculatorParams.coveredHeightMultiplier,
-            params.squashedRowsCalculatorParams.multiplier,
-            params.tunnelsCalculatorParams.minimumValuableHeight,
-            params.tunnelsCalculatorParams.countMultiplier,
-            params.tunnelsCalculatorParams.heightPowMultiplier,
-            params.tunnelsCalculatorParams.heightMultiplier,
-        ];
     }
 
     private async promiseAllWorkersFinished() {
