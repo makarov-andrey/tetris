@@ -1,4 +1,4 @@
-import {WorkerPool} from "workerpool";
+import {WorkerPool, WorkerPoolStats} from "workerpool";
 import {BenchRunParameters} from "./Common";
 import {BenchParamsGenerator} from "./BenchParamsGenerator";
 
@@ -10,23 +10,24 @@ class RunResult {
 }
 
 export class BenchManager {
-    private readonly iterations = 1000;
-    private readonly valuablePercentiles = [0, 50, 95, 99, 99.9];
     private resolveWorkersPoolFreed: (value: unknown) => void = () => {};
+    private resolveAllWorkersFinished: (value: unknown) => void = () => {};
 
     constructor(
-        private pool: WorkerPool,
-        private benchParamsGenerator: BenchParamsGenerator
+        private readonly pool: WorkerPool,
+        private readonly benchParamsGenerator: BenchParamsGenerator,
+        private readonly iterations = 1000,
+        private readonly percentiles = [0, 50, 95, 99, 99.9],
     ) {}
 
     public async startBench() {
-        console.log(this.benchParamsGenerator.count());
         for (let params of this.benchParamsGenerator.generate()) {
             this.run(params).then(result => {
-                console.log(`[${this.paramsToLogData(params).join(',')}]; {[${result.percentiles.join(',')}], ${result.average}}`);
+                console.log(`${new Date().toISOString()}; [${this.paramsToLogData(params).join(',')}]; {[${result.percentiles.join(',')}], ${result.average}}`);
             });
             await this.promiseWorkersPoolToFree();
         }
+        await this.promiseAllWorkersFinished();
     }
 
     private async run(params: BenchRunParameters): Promise<RunResult> {
@@ -35,15 +36,17 @@ export class BenchManager {
             promises.push(new Promise(resolve => {
                 this.pool.exec('solveTetris', [params])
                     .then((figuresFallen: number) => {
-                        this.checkWorkersPoolIfFree();
+                        const stats = this.pool.stats();
                         resolve(figuresFallen);
+                        this.checkWorkersPoolIfFree(stats);
+                        this.checkWorkersPoolIfFinished(stats);
                     });
             }));
         }
         const results = await Promise.all(promises);
         results.sort((a,b) => b - a);
         let percentileValues: Array<number> = [];
-        this.valuablePercentiles.forEach(percentile => {
+        this.percentiles.forEach(percentile => {
             percentileValues.push(results[Math.floor(this.iterations / 100 * percentile)]);
         });
         const average = results.reduce((a, b) => a + b, 0) / results.length;
@@ -59,8 +62,8 @@ export class BenchManager {
         });
     }
 
-    private checkWorkersPoolIfFree() {
-        if (this.pool.stats().pendingTasks < this.iterations) {
+    private checkWorkersPoolIfFree(stats: WorkerPoolStats) {
+        if (stats.pendingTasks < this.iterations) {
             this.resolveWorkersPoolFreed(true);
         }
     }
@@ -82,5 +85,17 @@ export class BenchManager {
             params.tunnelsCalculatorParams.heightPowMultiplier,
             params.tunnelsCalculatorParams.heightMultiplier,
         ];
+    }
+
+    private async promiseAllWorkersFinished() {
+        return new Promise(resolve => {
+            this.resolveAllWorkersFinished = resolve;
+        });
+    }
+
+    private checkWorkersPoolIfFinished(stats: WorkerPoolStats) {
+        if (stats.activeTasks == 0) {
+            this.resolveAllWorkersFinished(true);
+        }
     }
 }
