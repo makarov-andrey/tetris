@@ -69,6 +69,9 @@ if (debugMode) {
 const workerPath = path.resolve('./dist/node/tetris_solving_worker.js');
 const workerPool = (0, workerpool_1.pool)(workerPath, { maxWorkers: threads });
 if (debugMode) {
+    console.log('Resolved worker path: ', workerPath);
+}
+if (debugMode) {
     console.log('Worker pool has been initialized.');
 }
 const benchManager = new BenchManager_1.BenchManager(workerPool, new PersistedGenerator_1.PersistedGenerator(new StaticGenerator_1.StaticGenerator(), resultFilePath, debugMode), resultFilePath, iterations, percentiles, debugMode);

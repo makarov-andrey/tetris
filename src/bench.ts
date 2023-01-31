@@ -48,6 +48,10 @@ const workerPath = path.resolve('./dist/node/tetris_solving_worker.js');
 const workerPool = pool(workerPath, {maxWorkers: threads});
 
 if (debugMode) {
+    console.log('Resolved worker path: ', workerPath);
+}
+
+if (debugMode) {
     console.log('Worker pool has been initialized.');
 }
 
