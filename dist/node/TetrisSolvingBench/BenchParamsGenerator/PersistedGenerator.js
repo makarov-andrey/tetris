@@ -31,10 +31,12 @@ const fs = __importStar(require("fs"));
 class PersistedGenerator {
     baseGenerator;
     resultFileName;
+    debugMode;
     paramsSet;
-    constructor(baseGenerator, resultFileName) {
+    constructor(baseGenerator, resultFileName, debugMode) {
         this.baseGenerator = baseGenerator;
         this.resultFileName = resultFileName;
+        this.debugMode = debugMode;
     }
     *generate() {
         if (this.paramsSet === undefined) {
@@ -49,9 +51,15 @@ class PersistedGenerator {
         if (this.paramsSet !== undefined) {
             return;
         }
+        if (this.debugMode) {
+            console.log('Started to collect params');
+        }
         this.paramsSet = new Set();
         for (let params of this.baseGenerator.generate()) {
             this.paramsSet.add(params.toTuple().join(','));
+        }
+        if (this.debugMode) {
+            console.log(`${this.paramsSet.size} params have been collected from base generator`);
         }
         const fileReadInterface = readline.createInterface({
             input: fs.createReadStream(this.resultFileName),
@@ -66,6 +74,9 @@ class PersistedGenerator {
         await new Promise(resolve => {
             fileReadInterface.once('close', resolve);
         });
+        if (this.debugMode) {
+            console.log(`${this.paramsSet.size} params remains to process`);
+        }
     }
 }
 exports.PersistedGenerator = PersistedGenerator;

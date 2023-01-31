@@ -39,14 +39,16 @@ class BenchManager {
     resultFilePath;
     iterations;
     percentiles;
+    debugMode;
     resolveWorkersPoolFreed = () => { };
     resolveAllWorkersFinished = () => { };
-    constructor(pool, benchParamsGenerator, resultFilePath, iterations, percentiles) {
+    constructor(pool, benchParamsGenerator, resultFilePath, iterations, percentiles, debugMode) {
         this.pool = pool;
         this.benchParamsGenerator = benchParamsGenerator;
         this.resultFilePath = resultFilePath;
         this.iterations = iterations;
         this.percentiles = percentiles;
+        this.debugMode = debugMode;
     }
     async calculateBenchmarks() {
         await this.benchParamsGenerator.init();
@@ -60,7 +62,9 @@ class BenchManager {
                         avg: result.average,
                     },
                 });
-                console.log(log);
+                if (this.debugMode) {
+                    console.log(log);
+                }
                 fs.appendFile(this.resultFilePath, log + '\n', () => { });
             });
             await this.promiseWorkersPoolToFree();

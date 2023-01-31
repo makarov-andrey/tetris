@@ -20,6 +20,7 @@ export class BenchManager {
         private readonly resultFilePath: string,
         private readonly iterations: number,
         private readonly percentiles: number[],
+        private readonly debugMode: boolean,
     ) {}
 
     public async calculateBenchmarks() {
@@ -34,7 +35,9 @@ export class BenchManager {
                         avg: result.average,
                     },
                 });
-                console.log(log);
+                if (this.debugMode) {
+                    console.log(log);
+                }
                 fs.appendFile(this.resultFilePath, log + '\n', () => {});
             });
             await this.promiseWorkersPoolToFree();

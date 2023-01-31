@@ -8,7 +8,8 @@ export class PersistedGenerator implements BenchParamsGeneratorInterface {
 
     constructor(
         private readonly baseGenerator: BenchParamsGeneratorInterface,
-        private readonly resultFileName: string
+        private readonly resultFileName: string,
+        private readonly debugMode: boolean,
     ) {}
 
     *generate(): Generator<BenchRunParameters> {
@@ -26,9 +27,17 @@ export class PersistedGenerator implements BenchParamsGeneratorInterface {
             return;
         }
 
+        if (this.debugMode) {
+            console.log('Started to collect params');
+        }
+
         this.paramsSet = new Set();
         for (let params of this.baseGenerator.generate()) {
             this.paramsSet.add(params.toTuple().join(','));
+        }
+
+        if (this.debugMode) {
+            console.log(`${this.paramsSet.size} params have been collected from base generator`);
         }
 
         const fileReadInterface = readline.createInterface({
@@ -45,5 +54,9 @@ export class PersistedGenerator implements BenchParamsGeneratorInterface {
         await new Promise(resolve => {
             fileReadInterface.once('close', resolve);
         });
+
+        if (this.debugMode) {
+            console.log(`${this.paramsSet.size} params remains to process`);
+        }
     }
 }
