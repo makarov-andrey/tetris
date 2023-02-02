@@ -57,4 +57,3 @@ class FillableCellsCalculator {
     }
 }
 exports.FillableCellsCalculator = FillableCellsCalculator;
-//# sourceMappingURL=FillableCellsCalculator.js.map

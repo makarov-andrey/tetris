@@ -14,4 +14,3 @@ class EnumHelper {
     }
 }
 exports.EnumHelper = EnumHelper;
-//# sourceMappingURL=EnumHelper.js.map

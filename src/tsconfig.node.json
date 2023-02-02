@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "outDir": "../dist/node",
     "allowJs": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "lib": [
       "es2022",
       "dom",

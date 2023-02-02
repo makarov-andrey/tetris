@@ -4,26 +4,27 @@ import * as readline from 'readline';
 import * as fs from 'fs';
 
 export class PersistedGenerator implements BenchParamsGeneratorInterface {
-    private paramsSet?: Set<string>;
+    private params?: Array<string>;
 
     constructor(
         private readonly baseGenerator: BenchParamsGeneratorInterface,
         private readonly resultFileName: string,
         private readonly debugMode: boolean,
+        private readonly shuffle: boolean = true,
     ) {}
 
     *generate(): Generator<BenchRunParameters> {
-        if (this.paramsSet === undefined) {
+        if (this.params === undefined) {
             throw new UnexpectedNotInitializedStateError('The generator must be initialized before using');
         }
-        for (let stringyParamsTuple of this.paramsSet) {
+        for (let stringyParamsTuple of this.params) {
             const paramsTuple = stringyParamsTuple.split(',').map(val => Number.parseFloat(val));
             yield BenchRunParameters.fromTuple(paramsTuple);
         }
     }
 
     async init() {
-        if (this.paramsSet !== undefined) {
+        if (this.params !== undefined) {
             return;
         }
 
@@ -31,13 +32,13 @@ export class PersistedGenerator implements BenchParamsGeneratorInterface {
             console.log('Started to collect params');
         }
 
-        this.paramsSet = new Set();
+        let paramsSet: Set<string> = new Set();
         for (let params of this.baseGenerator.generate()) {
-            this.paramsSet.add(params.toTuple().join(','));
+            paramsSet.add(params.toTuple().join(','));
         }
 
         if (this.debugMode) {
-            console.log(`${this.paramsSet.size} params have been collected from base generator`);
+            console.log(`${paramsSet.size} params have been collected from base generator`);
         }
 
         const fileReadInterface = readline.createInterface({
@@ -47,7 +48,7 @@ export class PersistedGenerator implements BenchParamsGeneratorInterface {
 
         fileReadInterface.on('line', (line: string) => {
             try {
-                this.paramsSet?.delete(JSON.parse(line).par.join(','));
+                paramsSet.delete(JSON.parse(line).par.join(','));
             } catch (e: any) {}
         });
 
@@ -55,8 +56,16 @@ export class PersistedGenerator implements BenchParamsGeneratorInterface {
             fileReadInterface.once('close', resolve);
         });
 
+        this.params = [...paramsSet];
+        if (this.shuffle) {
+            for (let i = this.params.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [this.params[i], this.params[j]] = [this.params[j], this.params[i]];
+            }
+        }
+
         if (this.debugMode) {
-            console.log(`${this.paramsSet.size} params remains to process`);
+            console.log(`${paramsSet.size} params remains to process`);
         }
     }
 }

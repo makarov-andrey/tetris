@@ -143,4 +143,3 @@ class RZFigure extends SimplyRotatableFigure {
     }
 }
 exports.RZFigure = RZFigure;
-//# sourceMappingURL=Figures.js.map

@@ -11,4 +11,3 @@ document.addEventListener('DOMContentLoaded', () => {
     TetrisSolverFacade_1.TetrisSolverFacade.initSolver(eventBus, commandBus);
     tetris.start();
 });
-//# sourceMappingURL=index.js.map

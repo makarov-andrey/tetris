@@ -31,4 +31,3 @@ class SquashedRowsCounterBasedLevelCounter {
     }
 }
 exports.SquashedRowsCounterBasedLevelCounter = SquashedRowsCounterBasedLevelCounter;
-//# sourceMappingURL=SquashedRowsCounterBasedLevelCounter.js.map

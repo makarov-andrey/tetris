@@ -18,4 +18,3 @@ class SquashedRowsCalculator {
     }
 }
 exports.SquashedRowsCalculator = SquashedRowsCalculator;
-//# sourceMappingURL=SquashedRowsCalculator.js.map

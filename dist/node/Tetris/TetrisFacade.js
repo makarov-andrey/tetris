@@ -59,4 +59,3 @@ class TetrisFacade {
     }
 }
 exports.TetrisFacade = TetrisFacade;
-//# sourceMappingURL=TetrisFacade.js.map

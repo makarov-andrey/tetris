@@ -27,4 +27,3 @@ class TetrisSolverFacade {
     }
 }
 exports.TetrisSolverFacade = TetrisSolverFacade;
-//# sourceMappingURL=TetrisSolverFacade.js.map

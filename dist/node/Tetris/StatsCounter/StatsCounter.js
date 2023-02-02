@@ -20,4 +20,3 @@ class StatsCounter {
     }
 }
 exports.StatsCounter = StatsCounter;
-//# sourceMappingURL=StatsCounter.js.map

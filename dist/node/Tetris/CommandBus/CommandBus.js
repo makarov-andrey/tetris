@@ -188,4 +188,3 @@ class CommandBus {
     }
 }
 exports.CommandBus = CommandBus;
-//# sourceMappingURL=CommandBus.js.map

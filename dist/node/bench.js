@@ -36,24 +36,24 @@ function handleSignal(signal) {
     console.log(`Received signal ${signal}`);
 }
 const argv = (0, minimist_1.default)(process.argv.slice(2));
+const projectDirPath = argv.h || argv.projectDirPath || process.cwd();
+process.chdir(projectDirPath);
 const debugMode = (argv.d || argv.debugMode || '0') == '1';
 const threads = Number.parseInt(argv.t || argv.threads || '10');
 const iterations = Number.parseInt(argv.i || argv.iterations || '1000');
 const percentiles = (argv.p || argv.percentiles || '0,50,95,99,99.9').split(',').map((val) => Number.parseFloat(val));
-const projectDirPath = argv.h || argv.projectDirPath;
-if (projectDirPath !== undefined) {
-    process.chdir(projectDirPath);
-}
 const resultFilePath = path.resolve(argv.r || argv.resultFilePath || './result.txt');
+const workerPath = path.resolve('./dist/node/tetris_solving_worker.js');
 if (debugMode) {
     console.log('Bench counter started in debug mode.');
     console.log('Process id is', process.pid);
-    console.log('Arguments:');
-    console.log('debugMode', debugMode);
-    console.log('threads', threads);
-    console.log('iterations', iterations);
-    console.log('percentiles', percentiles);
-    console.log('resultFilePath', resultFilePath);
+    console.log('debugMode:', debugMode);
+    console.log('threads:', threads);
+    console.log('iterations:', iterations);
+    console.log('percentiles:', percentiles);
+    console.log('projectDirPath:', projectDirPath);
+    console.log('workerPath:', workerPath);
+    console.log('resultFilePath:', resultFilePath);
     [
         'SIGABRT', 'SIGALRM', 'SIGBUS', 'SIGCHLD', 'SIGCONT', 'SIGFPE', 'SIGHUP', 'SIGILL', 'SIGINT', 'SIGIO',
         'SIGIOT', 'SIGPIPE', 'SIGPOLL', 'SIGPROF', 'SIGPWR', 'SIGQUIT', 'SIGSEGV', 'SIGSTKFLT',
@@ -70,11 +70,7 @@ if (debugMode) {
         console.log(`Received unhandled rejection`, promise);
     });
 }
-const workerPath = path.resolve('./dist/node/tetris_solving_worker.js');
 const workerPool = (0, workerpool_1.pool)(workerPath, { maxWorkers: threads });
-if (debugMode) {
-    console.log('Resolved worker path: ', workerPath);
-}
 if (debugMode) {
     console.log('Worker pool has been initialized.');
 }
@@ -87,4 +83,3 @@ if (debugMode) {
         console.log(workerPool.stats());
     }, 10000);
 }
-//# sourceMappingURL=bench.js.map

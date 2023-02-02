@@ -18,4 +18,3 @@ class FigurePlacingChecker {
     }
 }
 exports.FigurePlacingChecker = FigurePlacingChecker;
-//# sourceMappingURL=FigurePlacingChecker.js.map

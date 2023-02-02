@@ -36,4 +36,3 @@ class AlwaysOneFigureSpawner {
     }
 }
 exports.AlwaysOneFigureSpawner = AlwaysOneFigureSpawner;
-//# sourceMappingURL=AlwaysOneFigureSpawner.js.map

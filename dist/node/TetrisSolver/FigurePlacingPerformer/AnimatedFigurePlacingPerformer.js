@@ -106,4 +106,3 @@ class AnimatedFigurePlacingPerformer {
     }
 }
 exports.AnimatedFigurePlacingPerformer = AnimatedFigurePlacingPerformer;
-//# sourceMappingURL=AnimatedFigurePlacingPerformer.js.map

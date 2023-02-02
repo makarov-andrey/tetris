@@ -96,4 +96,3 @@ class RegularFallingFiguresProcessor {
     }
 }
 exports.RegularFallingFiguresProcessor = RegularFallingFiguresProcessor;
-//# sourceMappingURL=RegularFallingFiguresProcessor.js.map

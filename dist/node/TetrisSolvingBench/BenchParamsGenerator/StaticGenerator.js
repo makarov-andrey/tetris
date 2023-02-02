@@ -74,4 +74,3 @@ class StaticGenerator {
     }
 }
 exports.StaticGenerator = StaticGenerator;
-//# sourceMappingURL=StaticGenerator.js.map

@@ -55,4 +55,3 @@ class GameController {
     }
 }
 exports.GameController = GameController;
-//# sourceMappingURL=GameController.js.map

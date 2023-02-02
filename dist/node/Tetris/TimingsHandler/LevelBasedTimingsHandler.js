@@ -13,4 +13,3 @@ class LevelBasedTimingsHandler {
     }
 }
 exports.LevelBasedTimingsHandler = LevelBasedTimingsHandler;
-//# sourceMappingURL=LevelBasedTimingsHandler.js.map

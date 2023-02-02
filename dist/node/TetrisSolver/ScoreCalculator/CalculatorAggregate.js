@@ -13,4 +13,3 @@ class CalculatorAggregate {
     }
 }
 exports.CalculatorAggregate = CalculatorAggregate;
-//# sourceMappingURL=CalculatorAggregate.js.map

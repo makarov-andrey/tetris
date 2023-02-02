@@ -184,4 +184,3 @@ class FigurePlacingResolver {
     }
 }
 exports.FigurePlacingResolver = FigurePlacingResolver;
-//# sourceMappingURL=FigurePlacingResolver.js.map

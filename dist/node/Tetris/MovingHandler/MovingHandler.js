@@ -90,4 +90,3 @@ class MovingHandler {
     }
 }
 exports.MovingHandler = MovingHandler;
-//# sourceMappingURL=MovingHandler.js.map

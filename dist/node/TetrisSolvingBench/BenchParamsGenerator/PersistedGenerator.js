@@ -32,34 +32,36 @@ class PersistedGenerator {
     baseGenerator;
     resultFileName;
     debugMode;
-    paramsSet;
-    constructor(baseGenerator, resultFileName, debugMode) {
+    shuffle;
+    params;
+    constructor(baseGenerator, resultFileName, debugMode, shuffle = true) {
         this.baseGenerator = baseGenerator;
         this.resultFileName = resultFileName;
         this.debugMode = debugMode;
+        this.shuffle = shuffle;
     }
     *generate() {
-        if (this.paramsSet === undefined) {
+        if (this.params === undefined) {
             throw new BenchParamsGeneratorInterface_1.UnexpectedNotInitializedStateError('The generator must be initialized before using');
         }
-        for (let stringyParamsTuple of this.paramsSet) {
+        for (let stringyParamsTuple of this.params) {
             const paramsTuple = stringyParamsTuple.split(',').map(val => Number.parseFloat(val));
             yield Common_1.BenchRunParameters.fromTuple(paramsTuple);
         }
     }
     async init() {
-        if (this.paramsSet !== undefined) {
+        if (this.params !== undefined) {
             return;
         }
         if (this.debugMode) {
             console.log('Started to collect params');
         }
-        this.paramsSet = new Set();
+        let paramsSet = new Set();
         for (let params of this.baseGenerator.generate()) {
-            this.paramsSet.add(params.toTuple().join(','));
+            paramsSet.add(params.toTuple().join(','));
         }
         if (this.debugMode) {
-            console.log(`${this.paramsSet.size} params have been collected from base generator`);
+            console.log(`${paramsSet.size} params have been collected from base generator`);
         }
         const fileReadInterface = readline.createInterface({
             input: fs.createReadStream(this.resultFileName),
@@ -67,17 +69,23 @@ class PersistedGenerator {
         });
         fileReadInterface.on('line', (line) => {
             try {
-                this.paramsSet?.delete(JSON.parse(line).par.join(','));
+                paramsSet.delete(JSON.parse(line).par.join(','));
             }
             catch (e) { }
         });
         await new Promise(resolve => {
             fileReadInterface.once('close', resolve);
         });
+        this.params = [...paramsSet];
+        if (this.shuffle) {
+            for (let i = this.params.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [this.params[i], this.params[j]] = [this.params[j], this.params[i]];
+            }
+        }
         if (this.debugMode) {
-            console.log(`${this.paramsSet.size} params remains to process`);
+            console.log(`${paramsSet.size} params remains to process`);
         }
     }
 }
 exports.PersistedGenerator = PersistedGenerator;
-//# sourceMappingURL=PersistedGenerator.js.map

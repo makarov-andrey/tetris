@@ -28,4 +28,3 @@ function solveTetris(paramsTuple) {
 workerpool_1.default.worker({
     solveTetris: solveTetris,
 });
-//# sourceMappingURL=tetris_solving_worker.js.map

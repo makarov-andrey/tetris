@@ -13,4 +13,3 @@ exports.InconsistentTargetStateError = InconsistentTargetStateError;
 class NotSupportedDirectionStepError extends PlacingError {
 }
 exports.NotSupportedDirectionStepError = NotSupportedDirectionStepError;
-//# sourceMappingURL=FigurePlacingPerformerInterface.js.map

@@ -24,4 +24,3 @@ class TetrisSolver {
     }
 }
 exports.TetrisSolver = TetrisSolver;
-//# sourceMappingURL=TetrisSolver.js.map

@@ -59,4 +59,3 @@ class Hole {
     }
 }
 exports.Hole = Hole;
-//# sourceMappingURL=Common.js.map

@@ -81,4 +81,3 @@ class HolesV1Calculator {
     }
 }
 exports.HolesV1Calculator = HolesV1Calculator;
-//# sourceMappingURL=HolesV1Calculator.js.map

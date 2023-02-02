@@ -41,4 +41,3 @@ class FallTickScoreCounter {
     }
 }
 exports.FallTickScoreCounter = FallTickScoreCounter;
-//# sourceMappingURL=FallTickScoreCounter.js.map

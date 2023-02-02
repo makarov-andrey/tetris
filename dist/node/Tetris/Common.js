@@ -83,4 +83,3 @@ class GameData {
     }
 }
 exports.GameData = GameData;
-//# sourceMappingURL=Common.js.map

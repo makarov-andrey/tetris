@@ -197,4 +197,3 @@ class TableRenderer {
     }
 }
 exports.TableRenderer = TableRenderer;
-//# sourceMappingURL=TableRenderer.js.map

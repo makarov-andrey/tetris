@@ -91,4 +91,3 @@ class EventBus {
     }
 }
 exports.EventBus = EventBus;
-//# sourceMappingURL=EventBus.js.map

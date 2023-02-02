@@ -55,4 +55,3 @@ class InstantFigurePlacingPerformer {
     }
 }
 exports.InstantFigurePlacingPerformer = InstantFigurePlacingPerformer;
-//# sourceMappingURL=InstantFigurePlacingPerformer.js.map
