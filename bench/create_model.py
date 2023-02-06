@@ -78,6 +78,6 @@ for degree in range(range_from, range_to + 1):
     print('Degree: %s' % degree)
     print('Mean squared error: %s' % error)
     print('Score: %s' % score)
-    print(y_test[:10])
-    print(list(map(lambda x: round(x, 3), y_pred[:10])))
+    print('Test: %s' % list(y_test[:10]))
+    print('Pred: %s' % list(map(lambda x: round(x, 3), y_pred[:10])))
     print()
