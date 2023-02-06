@@ -25,21 +25,19 @@ def create_model(x, y, degree):
 
 file = open('../result.txt', 'r')
 
-x = []
-y = []
+data = []
 while True:
     line = file.readline()
     if not line:
         break
 
     line_data = json.loads(line)
-    x.append(line_data['par'])
-    y.append(line_data['res']['avg'])
+    data.append([line_data['par'], line_data['res']['avg']])
 
 file.close()
 
-random.shuffle(x)
-random.shuffle(y)
+random.shuffle(data)
+[x, y] = zip(*data)
 
 # train_count = int(len(x) * 0.8)
 # x_train = x[:train_count]
@@ -80,6 +78,6 @@ for degree in range(range_from, range_to + 1):
     print('Degree: %s' % degree)
     print('Mean squared error: %s' % error)
     print('Score: %s' % score)
-    print('Test: %s' % y_test[:15])
-    print('Pred: %s' % list(map(lambda x: round(x, 3), y_pred[:15])))
+    print(y_test[:10])
+    print(list(map(lambda x: round(x, 3), y_pred[:10])))
     print()
