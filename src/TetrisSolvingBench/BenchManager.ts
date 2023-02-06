@@ -1,6 +1,6 @@
 import {WorkerPool, WorkerPoolStats} from "workerpool";
-import {BenchRunParameters} from "./Common";
 import {BenchParamsGeneratorInterface} from "./BenchParamsGenerator/BenchParamsGeneratorInterface";
+import {SolverRunParameters} from "../TetrisSolver/Common";
 import * as fs from 'fs';
 
 class RunResult {
@@ -45,7 +45,7 @@ export class BenchManager {
         await this.promiseAllWorkersFinished();
     }
 
-    private async run(params: BenchRunParameters): Promise<RunResult> {
+    private async run(params: SolverRunParameters): Promise<RunResult> {
         let promises: Promise<number>[] = [];
         for (let i = 0; i < this.iterations; i++) {
             promises.push(new Promise(resolve => {

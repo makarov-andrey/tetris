@@ -16,11 +16,12 @@ import {SquashedRowsCalculator} from "../TetrisSolver/ScoreCalculator/SquashedRo
 import {TunnelsCalculator} from "../TetrisSolver/ScoreCalculator/Tunnels/TunnelsCalculator";
 import {InstantFigurePlacingPerformer} from "../TetrisSolver/FigurePlacingPerformer/InstantFigurePlacingPerformer";
 import {RegularFallingFiguresProcessor} from "../Tetris/FallingFiguresProcessor/RegularFallingFiguresProcessor";
-import {BenchRunParameters} from "./Common";
+import {SolverRunParameters} from "../TetrisSolver/Common";
+import {SolverCommandBus} from "../TetrisSolver/CommandBus/CommandBus";
 
 export class BenchSolverFacade {
     public constructor(
-        private benchRunParameters: BenchRunParameters,
+        private solverRunParameters: SolverRunParameters,
         private eventBus = new EventBus(),
         private commandBus = new CommandBus(),
         private gameController = new GameController(
@@ -48,14 +49,15 @@ export class BenchSolverFacade {
         public tetrisSolver = new TetrisSolver(
             eventBus,
             commandBus,
+            new SolverCommandBus(),
             new FigurePlacingResolver(
                 commandBus,
                 new CalculatorAggregate([
-                    new FillableCellsCalculator(benchRunParameters.fillableCellsCalculatorParams),
-                    new FilledHeightCalculator(benchRunParameters.filledHeightCalculatorParams),
-                    new HolesV1Calculator(benchRunParameters.holesV1CalculatorParams),
-                    new SquashedRowsCalculator(benchRunParameters.squashedRowsCalculatorParams),
-                    new TunnelsCalculator(benchRunParameters.tunnelsCalculatorParams),
+                    new FillableCellsCalculator(solverRunParameters.fillableCellsCalculatorParams),
+                    new FilledHeightCalculator(solverRunParameters.filledHeightCalculatorParams),
+                    new HolesV1Calculator(solverRunParameters.holesV1CalculatorParams),
+                    new SquashedRowsCalculator(solverRunParameters.squashedRowsCalculatorParams),
+                    new TunnelsCalculator(solverRunParameters.tunnelsCalculatorParams),
                 ]),
             ),
             new InstantFigurePlacingPerformer(commandBus),

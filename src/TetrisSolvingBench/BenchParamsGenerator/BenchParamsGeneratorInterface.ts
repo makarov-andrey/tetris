@@ -1,4 +1,4 @@
-import {BenchRunParameters} from "../Common";
+import {SolverRunParameters} from "../../TetrisSolver/Common";
 
 export class UnexpectedNotInitializedStateError extends Error {}
 
@@ -8,5 +8,5 @@ export interface BenchParamsGeneratorInterface {
     /**
      * @throws UnexpectedNotInitializedStateError
      */
-    generate(): Iterable<BenchRunParameters>;
+    generate(): Iterable<SolverRunParameters>;
 }

@@ -1,12 +1,12 @@
-import {BenchRunParameters} from "../Common";
 import {FillableCellsCalculatorParams} from "../../TetrisSolver/ScoreCalculator/FillableCells/FillableCellsCalculator";
 import {FilledHeightCalculatorParams} from "../../TetrisSolver/ScoreCalculator/FilledHeight/FilledHeightCalculator";
 import {HolesV1CalculatorParams} from "../../TetrisSolver/ScoreCalculator/Holes/HolesV1Calculator";
 import {SquashedRowsCalculatorParams} from "../../TetrisSolver/ScoreCalculator/SquashedRows/SquashedRowsCalculator";
 import {TunnelsCalculatorParams} from "../../TetrisSolver/ScoreCalculator/Tunnels/TunnelsCalculator";
 import {BenchParamsGeneratorInterface} from "./BenchParamsGeneratorInterface";
+import {SolverRunParameters} from "../../TetrisSolver/Common";
 
-export class StaticGenerator implements BenchParamsGeneratorInterface {
+export class StaticMultiplierGenerator implements BenchParamsGeneratorInterface {
     private readonly fillableCellsMinimumValuableHeight = [5, 3, 7];
     private readonly fillableCellsPowMultiplier = [0, 1];
     private readonly fillableCellsMultiplier = [2, 1, 3];
@@ -26,7 +26,7 @@ export class StaticGenerator implements BenchParamsGeneratorInterface {
     private readonly tunnelsHeightPowMultiplier = [1, 0];
     private readonly tunnelsHeightMultiplier = [7, 5, 10];
 
-    public* generate(): Generator<BenchRunParameters> {
+    public* generate(): Generator<SolverRunParameters> {
         for (let squashedRowsMultiplier of this.squashedRowsMultiplier) {
             for (let tunnelsHeightPowMultiplier of this.tunnelsHeightPowMultiplier) {
                 for (let holesV1CoveredHeightPowMultiplier of this.holesV1CoveredHeightPowMultiplier) {
@@ -41,7 +41,7 @@ export class StaticGenerator implements BenchParamsGeneratorInterface {
                                                     for (let holesV1CountIncreaseMultiplier of this.holesV1CountIncreaseMultiplier) {
                                                         for (let fillableCellsMinimumValuableHeight of this.fillableCellsMinimumValuableHeight) {
                                                             for (let fillableCellsMultiplier of this.fillableCellsMultiplier) {
-                                                                yield new BenchRunParameters(
+                                                                yield new SolverRunParameters(
                                                                     new FillableCellsCalculatorParams(
                                                                         fillableCellsMinimumValuableHeight,
                                                                         fillableCellsPowMultiplier,

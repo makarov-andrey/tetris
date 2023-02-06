@@ -1,10 +1,10 @@
 import workerpool from 'workerpool';
 import {BenchSolverFacade} from "./TetrisSolvingBench/BenchSolverFacade";
 import {EventBus, EventType, FallTickProcessedEvent, GameOverEvent} from "./Tetris/EventBus/EventBus";
-import {BenchRunParameters, BenchRunParametersTuple} from "./TetrisSolvingBench/Common";
+import {SolverRunParameters, SolverRunParametersTuple} from "./TetrisSolver/Common";
 
-function solveTetris(paramsTuple: BenchRunParametersTuple): Promise<number> {
-    const params = BenchRunParameters.fromTuple(paramsTuple);
+function solveTetris(paramsTuple: SolverRunParametersTuple): Promise<number> {
+    const params = SolverRunParameters.fromTuple(paramsTuple);
     const eventBus = new EventBus();
     let bench = new BenchSolverFacade(params, eventBus);
     bench.start();

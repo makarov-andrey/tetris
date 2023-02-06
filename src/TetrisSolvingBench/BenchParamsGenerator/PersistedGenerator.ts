@@ -1,7 +1,7 @@
 import {BenchParamsGeneratorInterface, UnexpectedNotInitializedStateError} from "./BenchParamsGeneratorInterface";
-import {BenchRunParameters} from "../Common";
 import * as readline from 'readline';
 import * as fs from 'fs';
+import {SolverRunParameters} from "../../TetrisSolver/Common";
 
 export class PersistedGenerator implements BenchParamsGeneratorInterface {
     private params?: Array<string>;
@@ -13,13 +13,13 @@ export class PersistedGenerator implements BenchParamsGeneratorInterface {
         private readonly shuffle: boolean = true,
     ) {}
 
-    *generate(): Generator<BenchRunParameters> {
+    *generate(): Generator<SolverRunParameters> {
         if (this.params === undefined) {
             throw new UnexpectedNotInitializedStateError('The generator must be initialized before using');
         }
         for (let stringyParamsTuple of this.params) {
             const paramsTuple = stringyParamsTuple.split(',').map(val => Number.parseFloat(val));
-            yield BenchRunParameters.fromTuple(paramsTuple);
+            yield SolverRunParameters.fromTuple(paramsTuple);
         }
     }
 
