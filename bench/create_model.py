@@ -23,7 +23,6 @@ def create_model(x, y, degree):
     return [poly_model, regression_model]
 
 
-# Using readline()
 file = open('../result.txt', 'r')
 
 x = []
