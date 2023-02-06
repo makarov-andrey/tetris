@@ -7,6 +7,10 @@ from sklearn.metrics import mean_squared_error
 import pickle
 import json
 
+range_from = int(sys.argv[1])
+range_to = int(sys.argv[2])
+n_jobs = int(sys.argv[3])
+
 
 def create_model(x, y, degree):
     poly_model = PolynomialFeatures(degree=degree)
@@ -14,7 +18,7 @@ def create_model(x, y, degree):
     poly_x = poly_model.fit_transform(x)
     poly_model.fit(poly_x, y)
 
-    regression_model = LinearRegression()
+    regression_model = LinearRegression(n_jobs=n_jobs)
     regression_model.fit(poly_x, y)
     return [poly_model, regression_model]
 
@@ -55,7 +59,7 @@ min_error_degree = 0
 max_score = 0
 max_score_degree = 0
 
-for degree in range(int(sys.argv[1]), int(sys.argv[2]) + 1):
+for degree in range(range_from, range_to + 1):
     [poly_model, regression_model] = create_model(x_train, y_train, degree)
 
     poly_x_test = poly_model.fit_transform(x_test)
