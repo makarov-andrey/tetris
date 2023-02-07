@@ -4,11 +4,6 @@ import minimist from 'minimist';
 import {LoadManager} from "./TetrisSolvingLoadRunner/LoadManager";
 import {StaticRandomRangeGenerator} from "./TetrisSolvingLoadRunner/ParamsGenerator/StaticRandomRangeGenerator";
 import {PGResultSaver} from "./TetrisSolvingLoadRunner/ResultSaver/PGResultSaver";
-require('dotenv').config();
-
-function handleSignal(signal: string) {
-    console.log(`Received signal ${signal}`);
-}
 
 const argv = minimist(process.argv.slice(2));
 
@@ -18,6 +13,12 @@ const debugMode = (argv.d || argv.debugMode || '0') == '1';
 const threads = Number.parseInt(argv.t || argv.threads || '10');
 const iterations = Number.parseInt(argv.i || argv.iterations || '1000');
 const workerPath = path.resolve('./dist/node/tetris_solving_worker.js');
+
+require('dotenv').config();
+
+function handleSignal(signal: string) {
+    console.log(`Received signal ${signal}`);
+}
 
 if (debugMode) {
     console.log('Bench counter started in debug mode.');
