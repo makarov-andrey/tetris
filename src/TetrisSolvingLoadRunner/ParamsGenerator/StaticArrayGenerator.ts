@@ -1,7 +1,7 @@
-import {BenchParamsGeneratorInterface} from "./BenchParamsGeneratorInterface";
+import {ParamsGeneratorInterface} from "./ParamsGeneratorInterface";
 import {SolverRunParameters, SolverRunParametersTuple} from "../../TetrisSolver/Common";
 
-export class StaticArrayGenerator implements BenchParamsGeneratorInterface {
+export class StaticArrayGenerator implements ParamsGeneratorInterface {
     constructor(
         private list: SolverRunParametersTuple[] = []
     ) {}

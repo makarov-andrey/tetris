@@ -30,7 +30,7 @@ const path = __importStar(require("path"));
 const minimist_1 = __importDefault(require("minimist"));
 const readline_1 = __importDefault(require("readline"));
 const fs_1 = __importDefault(require("fs"));
-const StaticMultiplierGenerator_1 = require("./TetrisSolvingBench/BenchParamsGenerator/StaticMultiplierGenerator");
+const StaticMultiplierGenerator_1 = require("./TetrisSolvingLoadRunner/ParamsGenerator/StaticMultiplierGenerator");
 const argv = (0, minimist_1.default)(process.argv.slice(2));
 const resultFilePath = path.resolve(argv.r || argv.resultFilePath || './result.txt');
 const percentiles = (argv.p || argv.percentiles || '0,50,95,99,99.9').split(',').map((val) => Number.parseFloat(val));

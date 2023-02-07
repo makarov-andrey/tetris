@@ -2,7 +2,7 @@ import {SolverRunParameters} from "../../TetrisSolver/Common";
 
 export class UnexpectedNotInitializedStateError extends Error {}
 
-export interface BenchParamsGeneratorInterface {
+export interface ParamsGeneratorInterface {
     init(): Promise<void>;
 
     /**

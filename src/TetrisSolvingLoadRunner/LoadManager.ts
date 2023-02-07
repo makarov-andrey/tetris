@@ -1,44 +1,30 @@
 import {WorkerPool, WorkerPoolStats} from "workerpool";
-import {BenchParamsGeneratorInterface} from "./BenchParamsGenerator/BenchParamsGeneratorInterface";
+import {ParamsGeneratorInterface} from "./ParamsGenerator/ParamsGeneratorInterface";
 import {SolverRunParameters} from "../TetrisSolver/Common";
-import * as fs from 'fs';
+import {RunInfo, RunResult} from "./Common";
+import {ResultSaverInterface} from "./ResultSaver/ResultSaverInterface";
 
-class RunResult {
-    constructor(
-        public percentiles: Array<number>,
-        public average: number
-    ) {}
-}
-
-export class BenchManager {
+export class LoadManager {
     private resolveWorkersPoolFreed: (value: unknown) => void = () => {};
     private resolveAllWorkersFinished: (value: unknown) => void = () => {};
 
     constructor(
         private readonly pool: WorkerPool,
-        private readonly benchParamsGenerator: BenchParamsGeneratorInterface,
-        private readonly resultFilePath: string,
+        private readonly paramsGenerator: ParamsGeneratorInterface,
+        private readonly resultSaver: ResultSaverInterface,
         private readonly iterations: number,
-        private readonly percentiles: number[],
         private readonly debugMode: boolean,
     ) {}
 
     public async calculateBenchmarks() {
-        await this.benchParamsGenerator.init();
-        for (let params of this.benchParamsGenerator.generate()) {
+        await this.paramsGenerator.init();
+        for (let params of this.paramsGenerator.generate()) {
             this.run(params).then(result => {
-                const log = JSON.stringify({
-                    ts: new Date().toISOString(),
-                    par: params.toTuple(),
-                    res: {
-                        perc: result.percentiles,
-                        avg: result.average,
-                    },
-                });
+                const runInfo = new RunInfo(new Date(), params, result);
                 if (this.debugMode) {
-                    console.log(log);
+                    console.log([runInfo.date, runInfo.parameters.toTuple(), runInfo.result]);
                 }
-                fs.appendFile(this.resultFilePath, log + '\n', () => {});
+                this.resultSaver.save(runInfo);
             });
             await this.promiseWorkersPoolToFree();
         }
@@ -59,13 +45,7 @@ export class BenchManager {
             }));
         }
         const results = await Promise.all(promises);
-        results.sort((a,b) => b - a);
-        let percentileValues: Array<number> = [];
-        this.percentiles.forEach(percentile => {
-            percentileValues.push(results[Math.floor(this.iterations / 100 * percentile)]);
-        });
-        const average = results.reduce((a, b) => a + b, 0) / results.length;
-        return new RunResult(percentileValues, average);
+        return new RunResult(results);
     }
 
     private async promiseWorkersPoolToFree() {

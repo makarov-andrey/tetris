@@ -1,5 +1,5 @@
 import workerpool from 'workerpool';
-import {BenchSolverFacade} from "./TetrisSolvingBench/BenchSolverFacade";
+import {BenchSolverFacade} from "./TetrisSolvingLoadRunner/BenchSolverFacade";
 import {EventBus, EventType, FallTickProcessedEvent, GameOverEvent} from "./Tetris/EventBus/EventBus";
 import {SolverRunParameters, SolverRunParametersTuple} from "./TetrisSolver/Common";
 

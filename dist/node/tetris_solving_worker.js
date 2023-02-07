@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const workerpool_1 = __importDefault(require("workerpool"));
-const BenchSolverFacade_1 = require("./TetrisSolvingBench/BenchSolverFacade");
+const BenchSolverFacade_1 = require("./TetrisSolvingLoadRunner/BenchSolverFacade");
 const EventBus_1 = require("./Tetris/EventBus/EventBus");
 const Common_1 = require("./TetrisSolver/Common");
 function solveTetris(paramsTuple) {

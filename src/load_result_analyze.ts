@@ -2,7 +2,7 @@ import * as path from 'path';
 import minimist from 'minimist';
 import readline from "readline";
 import fs from "fs";
-import {StaticMultiplierGenerator} from "./TetrisSolvingBench/BenchParamsGenerator/StaticMultiplierGenerator";
+import {StaticMultiplierGenerator} from "./TetrisSolvingLoadRunner/ParamsGenerator/StaticMultiplierGenerator";
 
 const argv = minimist(process.argv.slice(2));
 const resultFilePath = path.resolve(argv.r || argv.resultFilePath || './result.txt');

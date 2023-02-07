@@ -1,13 +1,13 @@
-import {BenchParamsGeneratorInterface, UnexpectedNotInitializedStateError} from "./BenchParamsGeneratorInterface";
+import {ParamsGeneratorInterface, UnexpectedNotInitializedStateError} from "./ParamsGeneratorInterface";
 import * as readline from 'readline';
 import * as fs from 'fs';
 import {SolverRunParameters} from "../../TetrisSolver/Common";
 
-export class PersistedGenerator implements BenchParamsGeneratorInterface {
+export class PersistedGenerator implements ParamsGeneratorInterface {
     private params?: Array<string>;
 
     constructor(
-        private readonly baseGenerator: BenchParamsGeneratorInterface,
+        private readonly baseGenerator: ParamsGeneratorInterface,
         private readonly resultFileName: string,
         private readonly debugMode: boolean,
         private readonly shuffle: boolean = true,

@@ -3,10 +3,10 @@ import {FilledHeightCalculatorParams} from "../../TetrisSolver/ScoreCalculator/F
 import {HolesV1CalculatorParams} from "../../TetrisSolver/ScoreCalculator/Holes/HolesV1Calculator";
 import {SquashedRowsCalculatorParams} from "../../TetrisSolver/ScoreCalculator/SquashedRows/SquashedRowsCalculator";
 import {TunnelsCalculatorParams} from "../../TetrisSolver/ScoreCalculator/Tunnels/TunnelsCalculator";
-import {BenchParamsGeneratorInterface} from "./BenchParamsGeneratorInterface";
+import {ParamsGeneratorInterface} from "./ParamsGeneratorInterface";
 import {SolverRunParameters} from "../../TetrisSolver/Common";
 
-export class StaticMultiplierGenerator implements BenchParamsGeneratorInterface {
+export class StaticMultiplierGenerator implements ParamsGeneratorInterface {
     private readonly fillableCellsMinimumValuableHeight = [5, 3, 7];
     private readonly fillableCellsPowMultiplier = [0, 1];
     private readonly fillableCellsMultiplier = [2, 1, 3];
