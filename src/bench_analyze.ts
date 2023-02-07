@@ -2,7 +2,7 @@ import * as path from 'path';
 import minimist from 'minimist';
 import readline from "readline";
 import fs from "fs";
-import {StaticGenerator} from "./TetrisSolvingBench/BenchParamsGenerator/StaticGenerator";
+import {StaticMultiplierGenerator} from "./TetrisSolvingBench/BenchParamsGenerator/StaticMultiplierGenerator";
 
 const argv = minimist(process.argv.slice(2));
 const resultFilePath = path.resolve(argv.r || argv.resultFilePath || './result.txt');
@@ -62,7 +62,7 @@ fileReadInterface.once('close', () => {
         console.log();
     });
 
-    const allParamsNumber = new StaticGenerator().count();
+    const allParamsNumber = new StaticMultiplierGenerator().count();
     const countedPercent = allLinesCount/allParamsNumber*100;
     const valuableHours = [...timestampsByHours].filter(([hourStartTs, timestamps]) => {
         timestamps.sort((a, b) => a - b);

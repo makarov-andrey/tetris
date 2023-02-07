@@ -25,9 +25,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PersistedGenerator = void 0;
 const BenchParamsGeneratorInterface_1 = require("./BenchParamsGeneratorInterface");
-const Common_1 = require("../Common");
 const readline = __importStar(require("readline"));
 const fs = __importStar(require("fs"));
+const Common_1 = require("../../TetrisSolver/Common");
 class PersistedGenerator {
     baseGenerator;
     resultFileName;
@@ -46,7 +46,7 @@ class PersistedGenerator {
         }
         for (let stringyParamsTuple of this.params) {
             const paramsTuple = stringyParamsTuple.split(',').map(val => Number.parseFloat(val));
-            yield Common_1.BenchRunParameters.fromTuple(paramsTuple);
+            yield Common_1.SolverRunParameters.fromTuple(paramsTuple);
         }
     }
     async init() {

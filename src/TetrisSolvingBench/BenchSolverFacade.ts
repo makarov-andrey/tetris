@@ -17,7 +17,7 @@ import {TunnelsCalculator} from "../TetrisSolver/ScoreCalculator/Tunnels/Tunnels
 import {InstantFigurePlacingPerformer} from "../TetrisSolver/FigurePlacingPerformer/InstantFigurePlacingPerformer";
 import {RegularFallingFiguresProcessor} from "../Tetris/FallingFiguresProcessor/RegularFallingFiguresProcessor";
 import {SolverRunParameters} from "../TetrisSolver/Common";
-import {SolverCommandBus} from "../TetrisSolver/CommandBus/CommandBus";
+// import {SolverCommandBus} from "../TetrisSolver/CommandBus/CommandBus";
 
 export class BenchSolverFacade {
     public constructor(
@@ -49,7 +49,7 @@ export class BenchSolverFacade {
         public tetrisSolver = new TetrisSolver(
             eventBus,
             commandBus,
-            new SolverCommandBus(),
+            // new SolverCommandBus(),
             new FigurePlacingResolver(
                 commandBus,
                 new CalculatorAggregate([

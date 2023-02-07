@@ -30,7 +30,7 @@ const path = __importStar(require("path"));
 const minimist_1 = __importDefault(require("minimist"));
 const readline_1 = __importDefault(require("readline"));
 const fs_1 = __importDefault(require("fs"));
-const StaticGenerator_1 = require("./TetrisSolvingBench/BenchParamsGenerator/StaticGenerator");
+const StaticMultiplierGenerator_1 = require("./TetrisSolvingBench/BenchParamsGenerator/StaticMultiplierGenerator");
 const argv = (0, minimist_1.default)(process.argv.slice(2));
 const resultFilePath = path.resolve(argv.r || argv.resultFilePath || './result.txt');
 const percentiles = (argv.p || argv.percentiles || '0,50,95,99,99.9').split(',').map((val) => Number.parseFloat(val));
@@ -80,7 +80,7 @@ fileReadInterface.once('close', () => {
         console.log('Awards:', awards);
         console.log();
     });
-    const allParamsNumber = new StaticGenerator_1.StaticGenerator().count();
+    const allParamsNumber = new StaticMultiplierGenerator_1.StaticMultiplierGenerator().count();
     const countedPercent = allLinesCount / allParamsNumber * 100;
     const valuableHours = [...timestampsByHours].filter(([hourStartTs, timestamps]) => {
         timestamps.sort((a, b) => a - b);

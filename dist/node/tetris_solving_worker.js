@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const workerpool_1 = __importDefault(require("workerpool"));
 const BenchSolverFacade_1 = require("./TetrisSolvingBench/BenchSolverFacade");
 const EventBus_1 = require("./Tetris/EventBus/EventBus");
-const Common_1 = require("./TetrisSolvingBench/Common");
+const Common_1 = require("./TetrisSolver/Common");
 function solveTetris(paramsTuple) {
-    const params = Common_1.BenchRunParameters.fromTuple(paramsTuple);
+    const params = Common_1.SolverRunParameters.fromTuple(paramsTuple);
     const eventBus = new EventBus_1.EventBus();
     let bench = new BenchSolverFacade_1.BenchSolverFacade(params, eventBus);
     bench.start();

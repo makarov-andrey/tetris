@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const commandBus = new CommandBus();
     let tetris = new TetrisFacade(eventBus, commandBus);
     TetrisSolverFacade.initSolver(
-        SolverRunParameters.fromTuple([3, 1, 1, 0, 5, 170, 80, 1, 7, 5, 2, 40, 1, 10]),
+        // SolverRunParameters.fromTuple([3, 1, 1, 0, 5, 170, 80, 1, 7, 5, 2, 40, 1, 10]),
         eventBus,
         commandBus,
     );

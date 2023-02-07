@@ -19,8 +19,9 @@ const SquashedRowsCalculator_1 = require("../TetrisSolver/ScoreCalculator/Squash
 const TunnelsCalculator_1 = require("../TetrisSolver/ScoreCalculator/Tunnels/TunnelsCalculator");
 const InstantFigurePlacingPerformer_1 = require("../TetrisSolver/FigurePlacingPerformer/InstantFigurePlacingPerformer");
 const RegularFallingFiguresProcessor_1 = require("../Tetris/FallingFiguresProcessor/RegularFallingFiguresProcessor");
+// import {SolverCommandBus} from "../TetrisSolver/CommandBus/CommandBus";
 class BenchSolverFacade {
-    benchRunParameters;
+    solverRunParameters;
     eventBus;
     commandBus;
     gameController;
@@ -30,14 +31,16 @@ class BenchSolverFacade {
     statsCounter;
     gameData;
     tetrisSolver;
-    constructor(benchRunParameters, eventBus = new EventBus_1.EventBus(), commandBus = new CommandBus_1.CommandBus(), gameController = new GameController_1.GameController(new ConstTimingsHandler_1.ConstTimingsHandler(Infinity), eventBus, commandBus), movingHandler = new MovingHandler_1.MovingHandler(commandBus, eventBus), fallingFiguresProcessor = new RegularFallingFiguresProcessor_1.RegularFallingFiguresProcessor(commandBus, eventBus), figuresSpawner = new AlwaysOneFigureSpawner_1.AlwaysOneFigureSpawner(eventBus, commandBus), statsCounter = new StatsCounter_1.StatsCounter(commandBus, eventBus), gameData = Common_1.GameData.makeSimple(), tetrisSolver = new TetrisSolver_1.TetrisSolver(eventBus, commandBus, new FigurePlacingResolver_1.FigurePlacingResolver(commandBus, new CalculatorAggregate_1.CalculatorAggregate([
-        new FillableCellsCalculator_1.FillableCellsCalculator(benchRunParameters.fillableCellsCalculatorParams),
-        new FilledHeightCalculator_1.FilledHeightCalculator(benchRunParameters.filledHeightCalculatorParams),
-        new HolesV1Calculator_1.HolesV1Calculator(benchRunParameters.holesV1CalculatorParams),
-        new SquashedRowsCalculator_1.SquashedRowsCalculator(benchRunParameters.squashedRowsCalculatorParams),
-        new TunnelsCalculator_1.TunnelsCalculator(benchRunParameters.tunnelsCalculatorParams),
+    constructor(solverRunParameters, eventBus = new EventBus_1.EventBus(), commandBus = new CommandBus_1.CommandBus(), gameController = new GameController_1.GameController(new ConstTimingsHandler_1.ConstTimingsHandler(Infinity), eventBus, commandBus), movingHandler = new MovingHandler_1.MovingHandler(commandBus, eventBus), fallingFiguresProcessor = new RegularFallingFiguresProcessor_1.RegularFallingFiguresProcessor(commandBus, eventBus), figuresSpawner = new AlwaysOneFigureSpawner_1.AlwaysOneFigureSpawner(eventBus, commandBus), statsCounter = new StatsCounter_1.StatsCounter(commandBus, eventBus), gameData = Common_1.GameData.makeSimple(), tetrisSolver = new TetrisSolver_1.TetrisSolver(eventBus, commandBus, 
+    // new SolverCommandBus(),
+    new FigurePlacingResolver_1.FigurePlacingResolver(commandBus, new CalculatorAggregate_1.CalculatorAggregate([
+        new FillableCellsCalculator_1.FillableCellsCalculator(solverRunParameters.fillableCellsCalculatorParams),
+        new FilledHeightCalculator_1.FilledHeightCalculator(solverRunParameters.filledHeightCalculatorParams),
+        new HolesV1Calculator_1.HolesV1Calculator(solverRunParameters.holesV1CalculatorParams),
+        new SquashedRowsCalculator_1.SquashedRowsCalculator(solverRunParameters.squashedRowsCalculatorParams),
+        new TunnelsCalculator_1.TunnelsCalculator(solverRunParameters.tunnelsCalculatorParams),
     ])), new InstantFigurePlacingPerformer_1.InstantFigurePlacingPerformer(commandBus))) {
-        this.benchRunParameters = benchRunParameters;
+        this.solverRunParameters = solverRunParameters;
         this.eventBus = eventBus;
         this.commandBus = commandBus;
         this.gameController = gameController;
