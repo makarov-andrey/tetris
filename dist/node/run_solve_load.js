@@ -32,10 +32,6 @@ const minimist_1 = __importDefault(require("minimist"));
 const LoadManager_1 = require("./TetrisSolvingLoadRunner/LoadManager");
 const StaticRandomRangeGenerator_1 = require("./TetrisSolvingLoadRunner/ParamsGenerator/StaticRandomRangeGenerator");
 const PGResultSaver_1 = require("./TetrisSolvingLoadRunner/ResultSaver/PGResultSaver");
-require('dotenv').config();
-function handleSignal(signal) {
-    console.log(`Received signal ${signal}`);
-}
 const argv = (0, minimist_1.default)(process.argv.slice(2));
 const projectDirPath = argv.h || argv.projectDirPath || process.cwd();
 process.chdir(projectDirPath);
@@ -43,6 +39,10 @@ const debugMode = (argv.d || argv.debugMode || '0') == '1';
 const threads = Number.parseInt(argv.t || argv.threads || '10');
 const iterations = Number.parseInt(argv.i || argv.iterations || '1000');
 const workerPath = path.resolve('./dist/node/tetris_solving_worker.js');
+require('dotenv').config();
+function handleSignal(signal) {
+    console.log(`Received signal ${signal}`);
+}
 if (debugMode) {
     console.log('Bench counter started in debug mode.');
     console.log('Process id is', process.pid);
